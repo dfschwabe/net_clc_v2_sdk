@@ -9,7 +9,12 @@ using CenturyLinkCloudSdk.Runtime.Client;
 
 namespace CenturyLinkCloudSdk.Services
 {
-    public class AccountService
+    public interface ICenturyLinkCloudAccountService
+    {
+        Task<TotalAssets> GetAccountTotalAssets(IEnumerable<string> dataCenterIds, CancellationToken cancellationToken);
+    }
+
+    public class AccountService : ICenturyLinkCloudAccountService
     {
         private readonly IHttpClient _httpClient;
         private readonly IAliasProvider _aliasProvider;
