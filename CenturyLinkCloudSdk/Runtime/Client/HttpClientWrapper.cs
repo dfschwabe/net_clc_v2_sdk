@@ -9,6 +9,7 @@ namespace CenturyLinkCloudSdk.Runtime.Client
     public interface IHttpClient
     {
         Task<T> GetAsync<T>(string requestUri, CancellationToken cancellationToken);
+        Task<TResult> PostAsync<TBody, TResult>(string requestUri, TBody body, CancellationToken cancellationToken);
     }
 
     public class HttpClientWrapper : IHttpClient
@@ -29,6 +30,11 @@ namespace CenturyLinkCloudSdk.Runtime.Client
             var content = await response.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<T>(content);
+        }
+
+        public Task<TResult> PostAsync<TBody, TResult>(string requestUri, TBody body, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

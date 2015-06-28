@@ -39,9 +39,11 @@
     <Compile Include="Models\DataCenter.cs" />
     <Compile Include="Models\TotalAssets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runtime\Authentication.cs" />
     <Compile Include="Runtime\AuthenticationProvider.cs" />
     <Compile Include="Runtime\Client\HttpClientWrapper.cs" />
     <Compile Include="Runtime\Client\JsonMediaTypeHandler.cs" />
+    <Compile Include="Runtime\LoginRequest.cs" />
     <Compile Include="Services\AccountService.cs" />
   </ItemGroup>
   <ItemGroup>
