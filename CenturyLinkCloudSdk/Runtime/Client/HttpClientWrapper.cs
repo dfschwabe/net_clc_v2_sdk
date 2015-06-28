@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using CenturyLinkCloudSdk.Extensions;
 using Newtonsoft.Json;
 
 namespace CenturyLinkCloudSdk.Runtime.Client
@@ -22,11 +23,8 @@ namespace CenturyLinkCloudSdk.Runtime.Client
         public async Task<T> GetAsync<T>(string requestUri, CancellationToken cancellationToken)
         {
             var response = await _innerClient.GetAsync(requestUri, cancellationToken);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new CloudServiceException(response);
-            }
+            
+            response.EnsureCloudServiceSuccess();
 
             var content = await response.Content.ReadAsStringAsync();
 
