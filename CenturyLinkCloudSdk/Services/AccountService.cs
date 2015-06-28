@@ -24,18 +24,24 @@ namespace CenturyLinkCloudSdk.Services
         {
             var alias = await _aliasProvider.GetAccountAlias();
 
-            return dataCenterIds
-                        .Select(async id => await _httpClient.GetAsync<DataCenter>(String.Format("datacenters/{0}/{1}?totals=true", alias, id), CancellationToken.None))
-                        .Aggregate(new TotalAssets(), (accum, dc) =>
-                        {
-                            accum.Servers += dc.Result.Totals.Servers;
-                            accum.Cpus += dc.Result.Totals.Cpus;
-                            accum.MemoryGB += dc.Result.Totals.MemoryGB;
-                            accum.StorageGB += dc.Result.Totals.StorageGB;
-                            accum.Queue += dc.Result.Totals.Queue;
+            return dataCenterIds.Select(async id => await GetDatacenter(alias, id))
+                                .Aggregate(new TotalAssets(), SumDatacenters);
+        }
 
-                            return accum;
-                        });
+        private async Task<DataCenter> GetDatacenter(string alias, string id)
+        {
+            return await _httpClient.GetAsync<DataCenter>(String.Format("datacenters/{0}/{1}?totals=true", alias, id), CancellationToken.None);
+        }
+
+        private TotalAssets SumDatacenters(TotalAssets accumulator, Task<DataCenter> dc)
+        {
+            accumulator.Servers += dc.Result.Totals.Servers;
+            accumulator.Cpus += dc.Result.Totals.Cpus;
+            accumulator.MemoryGB += dc.Result.Totals.MemoryGB;
+            accumulator.StorageGB += dc.Result.Totals.StorageGB;
+            accumulator.Queue += dc.Result.Totals.Queue;
+
+            return accumulator;
         }
     }
 }
