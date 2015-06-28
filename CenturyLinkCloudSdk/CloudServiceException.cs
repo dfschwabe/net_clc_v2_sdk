@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 
 namespace CenturyLinkCloudSdk
@@ -9,9 +10,11 @@ namespace CenturyLinkCloudSdk
         {
             StatusCode = response.StatusCode;
             ReasonPhrase = response.ReasonPhrase;
+            Request = String.Format("{0}:{1}", response.RequestMessage.Method, response.RequestMessage.RequestUri);
         }
 
         public HttpStatusCode StatusCode { get; private set; }
         public string ReasonPhrase { get; private set; }
+        public string Request { get; private set; }
     }
 }

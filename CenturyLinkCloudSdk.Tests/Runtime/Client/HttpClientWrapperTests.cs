@@ -63,20 +63,24 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
         [Test]
         public void GetAsync_Throws_OnFailedRequest()
         {
+            var responseMessage = new HttpRequestMessage(HttpMethod.Get, "path/id")
+                                    .CreateResponse(HttpStatusCode.NotFound);
+
             _innerHandler.Protected()
                          .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                         .Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)));
+                         .Returns(Task.FromResult(responseMessage));
 
             try
             {
-                _testObject.GetAsync<Poco>("path/id", CancellationToken.None).Await();
+                _testObject.GetAsync<Poco>(string.Empty, CancellationToken.None).Await();
                 
                 Assert.Fail();
             }
             catch (CloudServiceException ex)
             {
-                Assert.AreEqual(HttpStatusCode.NotFound, ex.StatusCode);
-                Assert.AreEqual("Not Found", ex.ReasonPhrase);
+                Assert.AreEqual(responseMessage.StatusCode, ex.StatusCode);
+                Assert.AreEqual(responseMessage.ReasonPhrase, ex.ReasonPhrase);
+                Assert.AreEqual("GET:" + "path/id", ex.Request);
             }
         }
     }
