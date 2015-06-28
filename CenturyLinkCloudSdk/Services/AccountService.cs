@@ -24,13 +24,15 @@ namespace CenturyLinkCloudSdk.Services
         {
             var alias = await _aliasProvider.GetAccountAlias();
 
-            return dataCenterIds.Select(async id => await GetDatacenter(alias, id))
+            return dataCenterIds.Select(async id => await GetDatacenter(alias, id, cancellationToken))
                                 .Aggregate(new TotalAssets(), SumDatacenters);
         }
 
-        private async Task<DataCenter> GetDatacenter(string alias, string id)
+        private async Task<DataCenter> GetDatacenter(string alias, string id, CancellationToken cancellationToken)
         {
-            return await _httpClient.GetAsync<DataCenter>(String.Format("datacenters/{0}/{1}?totals=true", alias, id), CancellationToken.None);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await _httpClient.GetAsync<DataCenter>(String.Format("datacenters/{0}/{1}?totals=true", alias, id), cancellationToken);
         }
 
         private TotalAssets SumDatacenters(TotalAssets accumulator, Task<DataCenter> dc)

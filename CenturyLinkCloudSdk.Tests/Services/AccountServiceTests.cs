@@ -66,5 +66,20 @@ namespace CenturyLinkCloudSdk.Tests.Services
             Assert.AreEqual(3, result.StorageGB);
             Assert.AreEqual(3, result.Queue);
         }
+
+        [Test]
+        public void GetAccountTotalAssets_Aborts_OnTaskCancellation()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            _client.Setup(x => x.GetAsync<DataCenter>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Callback<string,CancellationToken>((uri,token) => tokenSource.Cancel(true))
+                .Returns(Task.FromResult(new DataCenter { Totals = new TotalAssets() }));
+
+
+            Assert.Throws<AggregateException>(() =>_testObject.GetAccountTotalAssets(new List<string> { CenterId1, CenterId2 }, tokenSource.Token).Wait());
+
+            _client.Verify(x => x.GetAsync<DataCenter>(It.IsAny<string>(), tokenSource.Token), Times.Once);
+        }
     }
 }
