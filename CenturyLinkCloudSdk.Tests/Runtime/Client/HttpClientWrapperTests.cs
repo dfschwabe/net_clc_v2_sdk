@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CenturyLinkCloudSdk.Runtime.Client;
 using Moq;
 using Moq.Protected;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace CenturyLinkCloudSdk.Tests.Runtime.Client
@@ -21,8 +22,7 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
         public void Setup()
         {
             _innerHandler = new Mock<HttpClientHandler>();
-            _innerClient = new HttpClient(_innerHandler.Object);
-            _innerClient.BaseAddress = new Uri(BaseAddress);
+            _innerClient = new HttpClient(_innerHandler.Object) {BaseAddress = new Uri(BaseAddress)};
 
             _testObject = new HttpClientWrapper(_innerClient);
         }
@@ -33,9 +33,9 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
             HttpRequestMessage actualRequest = null;
 
             _innerHandler.Protected()
-                        .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                        .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(string.Empty) }))
-                        .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualRequest = request);
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(string.Empty) }))
+                         .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualRequest = request);
 
             _testObject.GetAsync<string>("path/id", CancellationToken.None).Wait();
 
@@ -43,5 +43,25 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
             Assert.AreEqual(HttpMethod.Get, actualRequest.Method);
             Assert.AreEqual(BaseAddress + "/path/id", actualRequest.RequestUri.ToString());
         }
+
+        [Test]
+        public void GetAsync_DeserializesResponse()
+        {
+            var expected = new Poco {P1 = "value1"};
+
+            _innerHandler.Protected()
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(JsonConvert.SerializeObject(expected)) }));
+
+
+            var actual = _testObject.GetAsync<Poco>("path/id", CancellationToken.None).Result;
+
+            Assert.AreEqual(expected.P1, actual.P1);
+        }
+    }
+
+    public class Poco
+    {
+        public string P1 { get; set; }
     }
 }

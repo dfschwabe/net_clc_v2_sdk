@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace CenturyLinkCloudSdk.Runtime.Client
 {
@@ -23,7 +24,9 @@ namespace CenturyLinkCloudSdk.Runtime.Client
         {
             var response = await _innerClient.GetAsync(requestUri, cancellationToken);
 
-            return default(T);
+            var content = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<T>(content);
         }
     }
 }
