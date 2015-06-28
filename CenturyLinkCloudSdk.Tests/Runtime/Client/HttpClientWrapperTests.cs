@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,6 +58,26 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
             var actual = _testObject.GetAsync<Poco>("path/id", CancellationToken.None).Result;
 
             Assert.AreEqual(expected.P1, actual.P1);
+        }
+
+        [Test]
+        public void GetAsync_Throws_OnFailedRequest()
+        {
+            _innerHandler.Protected()
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)));
+
+            try
+            {
+                _testObject.GetAsync<Poco>("path/id", CancellationToken.None).Await();
+                
+                Assert.Fail();
+            }
+            catch (CloudServiceException ex)
+            {
+                Assert.AreEqual(HttpStatusCode.NotFound, ex.StatusCode);
+                Assert.AreEqual("Not Found", ex.ReasonPhrase);
+            }
         }
     }
 

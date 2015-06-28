@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CloudServiceException.cs" />
     <Compile Include="Models\DataCenter.cs" />
     <Compile Include="Models\TotalAssets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
