@@ -16,6 +16,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
     {
         private const string AccountAlias = "alias";
         private const string CenterId1 = "dc1";
+        private const string CenterId2 = "dc2";
         private Mock<IHttpClient> _client;
         private Mock<IAliasProvider> _aliasProvider;
         private AccountService _testObject;
@@ -38,11 +39,32 @@ namespace CenturyLinkCloudSdk.Tests.Services
             var requestUri = String.Format("datacenters/{0}/{1}?totals=true", AccountAlias, CenterId1);
             
             _client.Setup(x => x.GetAsync<DataCenter>(requestUri, It.IsAny<CancellationToken>()))
-                .Returns(Task.FromResult(new DataCenter()));
+                .Returns(Task.FromResult(new DataCenter{Totals = new TotalAssets()}));
             
             _testObject.GetAccountTotalAssets(new List<string> {CenterId1}, CancellationToken.None).Wait();
 
             _client.VerifyAll();
+        }
+
+        [Test]
+        public void GetAccountTotalAssets_AggregatesAcrossDataCenters()
+        {
+            var dc1 = new TotalAssets { Servers = 1, Cpus = 1, MemoryGB = 1, StorageGB = 1, Queue = 1 };
+            _client.Setup(x => x.GetAsync<DataCenter>(String.Format("datacenters/{0}/{1}?totals=true", AccountAlias, CenterId1), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(new DataCenter{ Totals = dc1 }));
+
+            var dc2 = new TotalAssets { Servers = 2, Cpus = 2, MemoryGB = 2, StorageGB = 2, Queue = 2 };
+            _client.Setup(x => x.GetAsync<DataCenter>(String.Format("datacenters/{0}/{1}?totals=true", AccountAlias, CenterId2), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(new DataCenter{ Totals = dc2 }));
+
+
+            var result =_testObject.GetAccountTotalAssets(new List<string> {CenterId1, CenterId2}, CancellationToken.None).Result;
+
+            Assert.AreEqual(3, result.Servers);
+            Assert.AreEqual(3, result.Cpus);
+            Assert.AreEqual(3, result.MemoryGB);
+            Assert.AreEqual(3, result.StorageGB);
+            Assert.AreEqual(3, result.Queue);
         }
     }
 }
