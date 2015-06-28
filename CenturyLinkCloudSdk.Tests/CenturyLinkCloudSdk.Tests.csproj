@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Runtime\Client\HttpClientWrapperTests.cs" />
     <Compile Include="Services\AccountServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
