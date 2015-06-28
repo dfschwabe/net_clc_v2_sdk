@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using CenturyLinkCloudSdk.Runtime.Client;
 
@@ -27,9 +26,9 @@ namespace CenturyLinkCloudSdk.Runtime
         {
             var loginRequest = new LoginRequest { UserName = _username, Password = _password };
 
-            await _client.PostAsync<LoginRequest, Authentication>("authentication/login", loginRequest, CancellationToken.None);
+            var authentication = await _client.PostAsync<LoginRequest, Authentication>("authentication/login", loginRequest, CancellationToken.None);
 
-            return string.Empty;
+            return authentication.AccountAlias;
         }
     }
 }

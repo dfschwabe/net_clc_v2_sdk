@@ -24,17 +24,25 @@ namespace CenturyLinkCloudSdk.Runtime.Client
         public async Task<T> GetAsync<T>(string requestUri, CancellationToken cancellationToken)
         {
             var response = await _innerClient.GetAsync(requestUri, cancellationToken);
-            
-            response.EnsureCloudServiceSuccess();
 
-            var content = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<T>(content);
+            return await GetContent<T>(response);
         }
 
-        public Task<TResult> PostAsync<TBody, TResult>(string requestUri, TBody body, CancellationToken cancellationToken)
+        public async Task<TResult> PostAsync<TBody, TResult>(string requestUri, TBody body, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var requestContent = new StringContent(JsonConvert.SerializeObject(body));
+            var response = await _innerClient.PostAsync(requestUri, requestContent, cancellationToken);
+
+            return await GetContent<TResult>(response);
+        }
+
+        private async Task<T> GetContent<T>(HttpResponseMessage response)
+        {
+            response.EnsureCloudServiceSuccess();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<T>(responseContent);
         }
     }
 }

@@ -42,5 +42,19 @@ namespace CenturyLinkCloudSdk.Tests.Runtime
             Assert.AreEqual(Username, actualContent.UserName);
             Assert.AreEqual(Password, actualContent.Password);
         }
+
+        [Test]
+        public void GetAccountAlias_ReturnsAccountAlias_FromResponseMessage()
+        {
+            var expectedAlias = "alias";
+
+            _client.Setup(x => x.PostAsync<LoginRequest,Authentication>(It.IsAny<string>(), It.IsAny<LoginRequest>(), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(new Authentication{AccountAlias = expectedAlias}));
+
+
+            var actualAlias = _testObject.GetAccountAlias().Result;
+
+            Assert.AreEqual(expectedAlias, actualAlias);
+        }
     }
 }
