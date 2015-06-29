@@ -9,15 +9,18 @@ namespace CenturyLinkCloudSdk.UAT
     [TestFixture]
     public abstract class FixtureBase
     {
+        private const string MockProxyBaseUri = "http://localhost:9000";
         private IDisposable _mockApi;
+        protected CenturyLinkCloudServiceFactory _serviceFactory;
 
         [TestFixtureSetUp]
         public void FixtureUp()
         {
             var config = new HttpConfiguration();
             config.Routes.MapHttpRoute("DefaultApi", "api/{controller}/{id}", new { id = RouteParameter.Optional });
+            _mockApi = WebApp.Start(new StartOptions(MockProxyBaseUri), builder => builder.UseWebApi(config));
 
-            _mockApi = WebApp.Start(new StartOptions("http://localhost:9000/"), builder => builder.UseWebApi(config));
+            _serviceFactory = new CenturyLinkCloudServiceFactory(string.Empty, string.Empty, new Uri(MockProxyBaseUri));
         }
 
         [TestFixtureTearDown]
