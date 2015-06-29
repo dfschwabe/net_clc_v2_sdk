@@ -17,7 +17,7 @@ namespace CenturyLinkCloudSdk.UAT
         public void FixtureUp()
         {
             var config = new HttpConfiguration();
-            config.Routes.MapHttpRoute("DefaultApi", "api/{controller}/{id}", new { id = RouteParameter.Optional });
+            config.MapHttpAttributeRoutes();
             _mockApi = WebApp.Start(new StartOptions(MockProxyBaseUri), builder => builder.UseWebApi(config));
 
             _serviceFactory = new CenturyLinkCloudServiceFactory(string.Empty, string.Empty, new Uri(MockProxyBaseUri));
