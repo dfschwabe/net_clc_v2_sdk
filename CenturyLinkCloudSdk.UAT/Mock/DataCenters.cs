@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CenturyLinkCloudSdk.UAT
+﻿namespace CenturyLinkCloudSdk.UAT.Mock
 {
     public static class DataCenters
     {

@@ -70,12 +70,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountServiceTests.cs" />
-    <Compile Include="DataCenters.cs" />
     <Compile Include="FixtureBase.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mock\Controllers\AuthenticationController.cs" />
     <Compile Include="Mock\Controllers\DatacenterController.cs" />
+    <Compile Include="Mock\DataCenters.cs" />
     <Compile Include="Mock\ErrorResponse.cs" />
     <Compile Include="Mock\Users.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
