@@ -62,6 +62,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\AuthenticationProviderTests.cs" />
+    <Compile Include="Runtime\Client\AuthenticationHandlerTests.cs" />
     <Compile Include="Runtime\Client\HttpClientWrapperTests.cs" />
     <Compile Include="Runtime\Client\JsonMediaTypeHandlerTests.cs" />
     <Compile Include="Services\AccountServiceTests.cs" />

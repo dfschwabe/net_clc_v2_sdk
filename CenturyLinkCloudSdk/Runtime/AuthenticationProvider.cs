@@ -9,6 +9,11 @@ namespace CenturyLinkCloudSdk.Runtime
         Task<string> GetAccountAlias();
     }
 
+    public interface ITokenProvider
+    {
+        Task<string> GetBearerToken();
+    }
+
     public class AuthenticationProvider : IAliasProvider
     {
         private readonly string _username;

@@ -42,6 +42,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\Authentication.cs" />
     <Compile Include="Runtime\AuthenticationProvider.cs" />
+    <Compile Include="Runtime\Client\AuthenticationHandler.cs" />
     <Compile Include="Runtime\Client\HttpClientWrapper.cs" />
     <Compile Include="Runtime\Client\JsonMediaTypeHandler.cs" />
     <Compile Include="Runtime\LoginRequest.cs" />
