@@ -75,6 +75,7 @@
     </Compile>
     <Compile Include="Mock\Controllers\AuthenticationController.cs" />
     <Compile Include="Mock\Controllers\DatacenterController.cs" />
+    <Compile Include="Mock\Controllers\TokenAuthorizationFilterAttribute.cs" />
     <Compile Include="Mock\DataCenters.cs" />
     <Compile Include="Mock\ErrorResponse.cs" />
     <Compile Include="Mock\Users.cs" />
