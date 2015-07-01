@@ -70,5 +70,26 @@ namespace CenturyLinkCloudSdk.Tests.Runtime
 
             Assert.AreEqual(expectedToken, actualToken);
         }
+
+        [Test]
+        public void Authentication_Is_Cached()
+        {
+            var expectedAuthentication = new Authentication {AccountAlias = "alias", BearerToken = "token"};
+            _client.SetupSequence(x => x.PostAsync<LoginRequest, Authentication>(It.IsAny<string>(), It.IsAny<LoginRequest>(), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(expectedAuthentication))
+                   .Returns(Task.FromResult(new Authentication { AccountAlias = "other alias", BearerToken = "other token" }));
+
+
+            _testObject.GetAccountAlias().Wait();
+            _testObject.GetBearerToken().Wait();
+            var actualAlias = _testObject.GetAccountAlias().Result;
+            var actualToken = _testObject.GetBearerToken().Result;
+
+
+            _client.Verify(x => x.PostAsync<LoginRequest, Authentication>(It.IsAny<string>(), It.IsAny<LoginRequest>(), It.IsAny<CancellationToken>())
+                , Times.Exactly(1));
+            Assert.AreEqual(expectedAuthentication.AccountAlias, actualAlias);
+            Assert.AreEqual(expectedAuthentication.BearerToken, actualToken);
+        }
     }
 }

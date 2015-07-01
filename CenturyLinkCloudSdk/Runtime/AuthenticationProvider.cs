@@ -19,6 +19,7 @@ namespace CenturyLinkCloudSdk.Runtime
         private readonly string _username;
         private readonly string _password;
         private readonly IHttpClient _client;
+        private Authentication _authentication;
 
         public AuthenticationProvider(string username, string password, IHttpClient httpClient)
         {
@@ -29,23 +30,28 @@ namespace CenturyLinkCloudSdk.Runtime
 
         public async Task<string> GetAccountAlias()
         {
-            var authentication = await Login();
+            var authentication = await GetAuthentication();
 
             return authentication.AccountAlias;
         }
 
         public async Task<string> GetBearerToken()
         {
-            var authentication = await Login();
+            var authentication = await GetAuthentication();
 
             return authentication.BearerToken;
         }
 
-        private async Task<Authentication> Login()
+        private async Task<Authentication> GetAuthentication()
         {
             var loginRequest = new LoginRequest {UserName = _username, Password = _password};
 
-            return await _client.PostAsync<LoginRequest, Authentication>("authentication/login", loginRequest, CancellationToken.None);
+            if (_authentication == null)
+            {
+                _authentication = await _client.PostAsync<LoginRequest, Authentication>("authentication/login", loginRequest, CancellationToken.None);
+            }
+
+            return _authentication;
         }
     }
 }
