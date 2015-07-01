@@ -8,8 +8,8 @@ namespace CenturyLinkCloudSdk
 {
     public class CenturyLinkCloudServiceFactory
     {
-        private readonly IAliasProvider _authenticationProvider;
-        private readonly IHttpClient _httpClient;
+        private readonly AuthenticationProvider _authenticationProvider;
+        private readonly IHttpClient _clientWrapper;
         
         public CenturyLinkCloudServiceFactory(string username, string password)
             : this(username, password, new Uri("https://api.ctl.io/v2"))
@@ -18,17 +18,21 @@ namespace CenturyLinkCloudSdk
 
         public CenturyLinkCloudServiceFactory(string username, string password, Uri proxyUri)
         {
-            var innerClient = HttpClientFactory.Create(new JsonMediaTypeHandler());
-            innerClient.BaseAddress = proxyUri;
+            var authProviderClient = HttpClientFactory.Create(new JsonMediaTypeHandler());
+            var authProviderWrapper = new HttpClientWrapper(authProviderClient);
+            _authenticationProvider = new AuthenticationProvider(username, password, authProviderWrapper);
             
-            _httpClient = new HttpClientWrapper(innerClient);
+            var authHandler = new AuthenticationHandler(_authenticationProvider);
+            var authorizedClient = HttpClientFactory.Create(authHandler, new JsonMediaTypeHandler());
+
+            authProviderClient.BaseAddress = authorizedClient.BaseAddress = proxyUri;
             
-            _authenticationProvider = new AuthenticationProvider(username, password, _httpClient);
+            _clientWrapper = new HttpClientWrapper(authorizedClient);
         }
 
         public ICenturyLinkCloudAccountService CreateAccountService()
         {
-            return new AccountService(_httpClient, _authenticationProvider);
+            return new AccountService(_clientWrapper, _authenticationProvider);
         }
     }
 }
