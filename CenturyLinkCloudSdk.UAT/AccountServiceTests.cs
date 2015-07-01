@@ -17,22 +17,24 @@ namespace CenturyLinkCloudSdk.UAT
         private TotalAssets _assetTotals;
         private User _currentUser;
 
-        [Test]
-        public void GetAccountTotalAssets_CalculatesDataCenters_ForAccountAlias()
+        [TestCase(Users.A)]
+        [TestCase(Users.B)]
+        public void GetAccountTotalAssets_CalculatesDataCenters_ForAccountAlias(string username)
         {
-            Given_I_Am(Users.UserA);
+            Given_I_Am(username);
             
             When_I_Request_Asset_Totals();
 
             Then_I_Receive_Totals_For_My_Data_Centers();
         }
 
-        private void Given_I_Am(User user)
+        private void Given_I_Am(string username)
         {
-            var serviceFactory = new CenturyLinkCloudServiceFactory(string.Empty, string.Empty, new Uri(MockProxyBaseUri));
+            _currentUser = Users.ByUsername[username];
+
+            var serviceFactory = new CenturyLinkCloudServiceFactory(_currentUser.Username, _currentUser.Password, new Uri(MockProxyBaseUri));
             _accountService = serviceFactory.CreateAccountService();
-            _dataCenterIds = user.DataCentersById.Keys.ToList();
-            _currentUser = user;
+            _dataCenterIds = _currentUser.DataCentersById.Keys.ToList();
         }
 
         private void When_I_Request_Asset_Totals()

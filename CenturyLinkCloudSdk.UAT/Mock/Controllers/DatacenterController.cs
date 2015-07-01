@@ -20,7 +20,7 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
                 return Request.CreateErrorResponse(HttpStatusCode.NotImplemented, "error");
             }
 
-            var dataCenter = Users.UsersByAccountAlias[alias].DataCentersById[id];
+            var dataCenter = Users.ByAccountAlias[alias].DataCentersById[id];
             
             return Request.CreateResponse(HttpStatusCode.OK, dataCenter);
         } 

@@ -11,9 +11,16 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
         [Route("authentication/login")]
         public HttpResponseMessage Post(MockLogin login)
         {
+            User user = Users.Login(login.UserName, login.Password);
+            if (user == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new ErrorResponse { message = "We didn't recognize the username or password you entered. Please try again" });
+            }
+
+
             var authentication = new MockAuthentication
             {
-                AccountAlias = Users.UserA.AccountAlias,
+                AccountAlias = user.AccountAlias,
                 BearerToken = Token
             };
 
