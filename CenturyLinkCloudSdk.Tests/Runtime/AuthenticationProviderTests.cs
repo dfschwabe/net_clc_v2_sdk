@@ -56,5 +56,19 @@ namespace CenturyLinkCloudSdk.Tests.Runtime
 
             Assert.AreEqual(expectedAlias, actualAlias);
         }
+
+        [Test]
+        public void GetBearerToken_ReturnsAccountAlias_FromResponseMessage()
+        {
+            var expectedToken = "token";
+
+            _client.Setup(x => x.PostAsync<LoginRequest, Authentication>(It.IsAny<string>(), It.IsAny<LoginRequest>(), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(new Authentication { BearerToken = expectedToken }));
+
+
+            var actualToken = _testObject.GetBearerToken().Result;
+
+            Assert.AreEqual(expectedToken, actualToken);
+        }
     }
 }
