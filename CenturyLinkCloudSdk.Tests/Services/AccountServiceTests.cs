@@ -30,7 +30,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
 
             _aliasProvider = new Mock<IAliasProvider>();
             _aliasProvider.Setup(x => x.GetAccountAlias())
-                .Returns(Task.FromResult(AccountAlias));
+                          .Returns(Task.FromResult(AccountAlias));
 
             _testObject = new AccountService(_client.Object, _aliasProvider.Object);
         }
@@ -83,6 +83,53 @@ namespace CenturyLinkCloudSdk.Tests.Services
             Assert.Throws<AggregateException>(() =>_testObject.GetAccountTotalAssets(new List<string> { CenterId1, CenterId2 }, tokenSource.Token).Wait());
 
             _client.Verify(x => x.GetAsync<DataCenter>(It.IsAny<string>(), tokenSource.Token), Times.Once);
+        }
+
+        [Test]
+        public void GetRecentActivity_RequestsActivity_ForAuthenticatedUser()
+        {
+            ActivityFilter expectedFilter = new ActivityFilter { Accounts = new[] {AccountAlias}, Limit = 5};
+            ActivityFilter actualFilter = null;
+            var expectedToken = new CancellationTokenSource().Token;
+
+            _client.Setup(x => x.PostAsync<ActivityFilter, IEnumerable<Activity>>("search/activities", It.IsAny<ActivityFilter>(), expectedToken))
+                   .Callback<string, ActivityFilter, CancellationToken>((uri,filter,token) => actualFilter = filter)
+                   .Returns(Task.FromResult(new List<Activity>().AsEnumerable()));
+
+            _testObject.GetRecentActivity(expectedFilter.Limit, expectedToken).Wait();
+
+            _client.VerifyAll();
+            Assert.NotNull(actualFilter);
+            CollectionAssert.AreEqual(expectedFilter.Accounts, actualFilter.Accounts);
+            Assert.AreEqual(expectedFilter.Limit, actualFilter.Limit);
+        }
+
+        [Test]
+        public void GetRecentActivity_ReturnsExpectedResult()
+        {
+            var expectedResult = new List<Activity>().AsEnumerable();
+
+            _client.Setup(x => x.PostAsync<ActivityFilter, IEnumerable<Activity>>(It.IsAny<string>(), It.IsAny<ActivityFilter>(), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(expectedResult));
+
+            var actualResult = _testObject.GetRecentActivity(1, CancellationToken.None).Result;
+
+            Assert.AreSame(expectedResult, actualResult);
+        }
+
+        [Test]
+        public void GetRecentActivity_Aborts_OnTaskCancellation()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            _aliasProvider.Setup(x => x.GetAccountAlias())
+                          .Callback(() => tokenSource.Cancel(true))
+                          .Returns(Task.FromResult(AccountAlias));
+
+            Assert.Throws<TaskCanceledException>(() => _testObject.GetRecentActivity(5, tokenSource.Token).Await());
+
+            _client.Verify(x => x.PostAsync<ActivityFilter, IEnumerable<Activity>>(It.IsAny<string>(), It.IsAny<ActivityFilter>(), It.IsAny<CancellationToken>())
+                                 , Times.Never);
         }
 
         [Test]

@@ -13,6 +13,7 @@ namespace CenturyLinkCloudSdk.Services
     public interface ICenturyLinkCloudAccountService
     {
         Task<TotalAssets> GetAccountTotalAssets(IEnumerable<string> dataCenterIds, CancellationToken cancellationToken);
+        Task<IEnumerable<Activity>> GetRecentActivity(int recordCountLimit, CancellationToken cancellationToken);
         Task<IEnumerable<Activity>> GetRecentActivityByAccountAlias(IEnumerable<string> aliases, int recordCountLimit, CancellationToken cancellationToken);
     }
 
@@ -33,6 +34,15 @@ namespace CenturyLinkCloudSdk.Services
 
             return dataCenterIds.Select(async id => await GetDatacenter(alias, id, cancellationToken))
                                 .Aggregate(new TotalAssets(), SumDatacenters);
+        }
+
+        public async Task<IEnumerable<Activity>> GetRecentActivity(int recordCountLimit, CancellationToken cancellationToken)
+        {
+            var alias = await _aliasProvider.GetAccountAlias();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await GetRecentActivityByAccountAlias(new []{alias}, recordCountLimit, cancellationToken);
         }
 
         public async Task<IEnumerable<Activity>> GetRecentActivityByAccountAlias(IEnumerable<string> aliases, int recordCountLimit, CancellationToken cancellationToken)
