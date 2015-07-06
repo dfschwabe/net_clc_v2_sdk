@@ -37,6 +37,7 @@
     <Compile Include="CenturyLinkCloudServiceFactory.cs" />
     <Compile Include="CloudServiceException.cs" />
     <Compile Include="Extensions\HttpResponseMessageExtensions.cs" />
+    <Compile Include="Models\Activity.cs" />
     <Compile Include="Models\DataCenter.cs" />
     <Compile Include="Models\TotalAssets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
