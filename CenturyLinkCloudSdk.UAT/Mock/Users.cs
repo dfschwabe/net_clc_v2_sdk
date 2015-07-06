@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CenturyLinkCloudSdk.UAT.Mock
@@ -15,6 +16,22 @@ namespace CenturyLinkCloudSdk.UAT.Mock
                 Username = A,
                 Password = "passA",
                 AccountAlias = "aliasA",
+                RecentActivity = new List<MockActivity>
+                {
+                    new MockActivity
+                    {
+                        AccountAlias = "aliasA",
+                        AccountDescription = "CLC Virtual Block Storage",
+                        Body = "Roles updated to: AccountAdmin",
+                        CreatedBy = "admin",
+                        CreatedDate = DateTime.Now,
+                        EntityId = 1,
+                        EntityType = "User",
+                        LocationAlias = "VA1",
+                        ReferenceId = "VA1aliasACI01",
+                        Subject = "Server VA1T3BKCI01 Configuration Updated"
+                    }
+                },
                 DataCentersById = new Dictionary<string, MockDataCenter>
                 {
                     {DataCenters.DCA.Id, DataCenters.DCA},
@@ -27,6 +44,22 @@ namespace CenturyLinkCloudSdk.UAT.Mock
                 Username = B,
                 Password = "passB",
                 AccountAlias = "aliasB",
+                RecentActivity = new List<MockActivity>
+                {
+                    new MockActivity
+                    {
+                        AccountAlias = "aliasB",
+                        AccountDescription = "CLC Virtual Block Storage",
+                        Body = "Server X Deleted by admin",
+                        CreatedBy = "admin",
+                        CreatedDate = DateTime.Now,
+                        EntityId = 2,
+                        EntityType = "Server",
+                        LocationAlias = "VA1",
+                        ReferenceId = "VA1aliasBCI01",
+                        Subject = "Server VA1T3BKCI01 Configuration Updated"
+                    }
+                },
                 DataCentersById = new Dictionary<string, MockDataCenter>
                 {
                     {DataCenters.DCB.Id, DataCenters.DCB},
@@ -55,6 +88,30 @@ namespace CenturyLinkCloudSdk.UAT.Mock
         public string Username { get; set; }
         public string Password { get; set; }
         public string AccountAlias { get; set; }
+        public List<MockActivity> RecentActivity { get; set; }
         public Dictionary<string, MockDataCenter> DataCentersById { get; set; } 
+    }
+
+    public class MockActivity
+    {
+        public string AccountAlias { get; set; }
+
+        public string Body { get; set; }
+
+        public string AccountDescription { get; set; }
+
+        public int EntityId { get; set; }
+
+        public string ReferenceId { get; set; }
+
+        public string EntityType { get; set; }
+
+        public string LocationAlias { get; set; }
+
+        public string CreatedBy { get; set; }
+
+        public DateTime CreatedDate { get; set; }
+
+        public string Subject { get; set; }
     }
 }
