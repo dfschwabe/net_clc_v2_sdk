@@ -12,7 +12,7 @@ namespace CenturyLinkCloudSdk
         private readonly IHttpClient _clientWrapper;
         
         public CenturyLinkCloudServiceFactory(string username, string password)
-            : this(username, password, new Uri("https://api.ctl.io/v2"))
+            : this(username, password, new Uri("https://api.ctl.io/v2/"))
         {
         }
 

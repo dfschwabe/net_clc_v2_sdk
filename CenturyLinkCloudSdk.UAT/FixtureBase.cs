@@ -11,7 +11,7 @@ namespace CenturyLinkCloudSdk.UAT
     public abstract class FixtureBase
     {
         private IDisposable _mockApi;
-        protected const string MockProxyBaseUri = "http://localhost:9000";
+        private const string MockProxyBaseUri = "http://localhost:9000";
         protected User CurrentUser { get; set; }
         protected CenturyLinkCloudServiceFactory ServiceFactory { get; set; }
 
