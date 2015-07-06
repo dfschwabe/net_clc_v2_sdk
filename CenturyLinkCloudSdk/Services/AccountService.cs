@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CenturyLinkCloudSdk.Models;
+using CenturyLinkCloudSdk.Models.Internal;
 using CenturyLinkCloudSdk.Runtime;
 using CenturyLinkCloudSdk.Runtime.Client;
 
@@ -36,7 +37,9 @@ namespace CenturyLinkCloudSdk.Services
 
         public async Task<IEnumerable<Activity>> GetRecentActivityByAccountAlias(IEnumerable<string> aliases, int recordCountLimit, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var filter = new ActivityFilter {Accounts = aliases, Limit = recordCountLimit};
+         
+            return await _httpClient.PostAsync<ActivityFilter, IEnumerable<Activity>>("search/activities", filter, cancellationToken);
         }
 
         private async Task<DataCenter> GetDatacenter(string alias, string id, CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-﻿namespace CenturyLinkCloudSdk.Models
+﻿namespace CenturyLinkCloudSdk.Models.Internal
 {
     public class DataCenter
     {
