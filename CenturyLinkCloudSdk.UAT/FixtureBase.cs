@@ -2,6 +2,7 @@
 using System.Web.Http;
 using CenturyLinkCloudSdk.UAT.Mock;
 using Microsoft.Owin.Hosting;
+using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using Owin;
 
@@ -20,6 +21,7 @@ namespace CenturyLinkCloudSdk.UAT
         {
             var config = new HttpConfiguration();
             config.MapHttpAttributeRoutes();
+            config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             _mockApi = WebApp.Start(new StartOptions(MockProxyBaseUri), builder => builder.UseWebApi(config));
         }
 

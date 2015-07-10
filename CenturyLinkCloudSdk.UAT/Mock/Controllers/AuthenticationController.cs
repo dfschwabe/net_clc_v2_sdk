@@ -1,6 +1,10 @@
+using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
 {
@@ -34,10 +38,41 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
         public string BearerToken { get; set; }
     }
 
+    [JsonConverter(typeof(MockLoginConverter))]
     public class MockLogin
     {
         public string UserName { get; set; }
 
         public string Password { get; set; }
+    }
+
+    /// This will ensure we promptly fail in the event that the client is configured to serialize to pascal-case
+    public class MockLoginConverter : JsonConverter
+    {
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        {
+            JObject jsonObject = JObject.Load(reader);
+            var properties = jsonObject.Properties().ToList();
+
+            if (properties[0].Name != "userName")
+            {
+                throw new JsonSerializationException("camel-case please");
+            }
+
+            return new MockLogin
+            {
+                UserName = (string)properties[0].Value,
+                Password = (string)properties[1].Value
+            };
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return false;
+        }
+
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+        }
     }
 }
