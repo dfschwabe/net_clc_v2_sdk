@@ -22,13 +22,4 @@ namespace CenturyLinkCloudSdk.Tests
             return default(T);
         }
     }
-
-    public static class HttpRequestMessageExtensions
-    {
-        public static T ReadContentAs<T>(this HttpRequestMessage request)
-        {
-            return JsonConvert.DeserializeObject<T>(request.Content.ReadAsStringAsync().Result);
-        }
-    }
-
 }
