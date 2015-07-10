@@ -3,6 +3,8 @@ using System.Net.Http;
 using CenturyLinkCloudSdk.Runtime;
 using CenturyLinkCloudSdk.Runtime.Client;
 using CenturyLinkCloudSdk.Services;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace CenturyLinkCloudSdk
 {
@@ -18,16 +20,21 @@ namespace CenturyLinkCloudSdk
 
         public CenturyLinkCloudServiceFactory(string username, string password, Uri proxyUri)
         {
+            var serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+
             var authProviderClient = HttpClientFactory.Create(new JsonMediaTypeHandler());
-            var authProviderWrapper = new HttpClientWrapper(authProviderClient);
+            var authProviderWrapper = new HttpClientWrapper(authProviderClient, serializerSettings);
             _authenticationProvider = new AuthenticationProvider(username, password, authProviderWrapper);
             
             var authHandler = new AuthenticationHandler(_authenticationProvider);
             var authorizedClient = HttpClientFactory.Create(authHandler, new JsonMediaTypeHandler());
 
             authProviderClient.BaseAddress = authorizedClient.BaseAddress = proxyUri;
-            
-            _clientWrapper = new HttpClientWrapper(authorizedClient);
+
+            _clientWrapper = new HttpClientWrapper(authorizedClient, serializerSettings);
         }
 
         public ICenturyLinkCloudAccountService CreateAccountService()

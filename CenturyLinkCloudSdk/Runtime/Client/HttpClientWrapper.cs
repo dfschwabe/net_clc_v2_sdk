@@ -15,10 +15,12 @@ namespace CenturyLinkCloudSdk.Runtime.Client
     public class HttpClientWrapper : IHttpClient
     {
         private readonly HttpClient _innerClient;
+        private readonly JsonSerializerSettings _serializerSettings;
 
-        public HttpClientWrapper(HttpClient innerClient)
+        public HttpClientWrapper(HttpClient innerClient, JsonSerializerSettings serializerSettings)
         {
             _innerClient = innerClient;
+            _serializerSettings = serializerSettings;
         }
 
         public async Task<T> GetAsync<T>(string requestUri, CancellationToken cancellationToken)
