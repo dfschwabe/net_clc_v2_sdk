@@ -32,7 +32,7 @@ namespace CenturyLinkCloudSdk.Runtime.Client
 
         public async Task<TResult> PostAsync<TBody, TResult>(string requestUri, TBody body, CancellationToken cancellationToken)
         {
-            var requestContent = new StringContent(JsonConvert.SerializeObject(body));
+            var requestContent = new StringContent(JsonConvert.SerializeObject(body, _serializerSettings));
             var response = await _innerClient.PostAsync(requestUri, requestContent, cancellationToken);
 
             return await GetContent<TResult>(response);

@@ -7,6 +7,7 @@ using CenturyLinkCloudSdk.Runtime.Client;
 using Moq;
 using Moq.Protected;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 
 namespace CenturyLinkCloudSdk.Tests.Runtime.Client
@@ -18,14 +19,16 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
         private Mock<HttpClientHandler> _innerHandler;
         private HttpClient _innerClient;
         private HttpClientWrapper _testObject;
+        private JsonSerializerSettings _serializerSettings;
 
         [SetUp]
         public void Setup()
         {
             _innerHandler = new Mock<HttpClientHandler>();
             _innerClient = new HttpClient(_innerHandler.Object) {BaseAddress = new Uri(BaseAddress)};
-
-            _testObject = new HttpClientWrapper(_innerClient);
+            _serializerSettings = new JsonSerializerSettings{ContractResolver = new CamelCasePropertyNamesContractResolver()};
+            
+            _testObject = new HttpClientWrapper(_innerClient, _serializerSettings);
         }
 
         [Test]
@@ -104,19 +107,19 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
         [Test]
         public void PostAsync_PostsCorrectContent()
         {
-            Poco actualBody = null;
+            string actualBody = null;
             var expectedBody = new Poco {P1 = "request"};
             
 
             _innerHandler.Protected()
                          .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
                          .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(string.Empty) }))
-                         .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualBody = request.ReadContentAs<Poco>());
+                         .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualBody = request.Content.ReadAsStringAsync().Result);
 
             _testObject.PostAsync<Poco, string>("path/id", expectedBody, CancellationToken.None).Wait();
 
             Assert.NotNull(actualBody);
-            Assert.AreEqual(expectedBody.P1, actualBody.P1);
+            Assert.AreEqual(JsonConvert.SerializeObject(expectedBody, _serializerSettings), actualBody);
         }
 
         [Test]
