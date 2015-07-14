@@ -31,6 +31,12 @@ namespace CenturyLinkCloudSdk.UAT
             _mockApi.Dispose();
         }
 
+        [SetUp]
+        public void Setup()
+        {
+            Users.Reset();
+        }
+
         protected void Given_I_Am(string username)
         {
             CurrentUser = Users.ByUsername[username];

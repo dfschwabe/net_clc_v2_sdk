@@ -15,12 +15,6 @@ namespace CenturyLinkCloudSdk.UAT
         private AlertPolicyDefniition _policyDefinition;
         private AlertPolicy _policyResult;
 
-        [SetUp]
-        public void Setup()
-        {
-            Users.All.ForEach(u => u.AlertPolicies.Clear());
-        }
-
         [Test]
         public void Create_PostsPolicyDefinition_ToCorrectAccount()
         {

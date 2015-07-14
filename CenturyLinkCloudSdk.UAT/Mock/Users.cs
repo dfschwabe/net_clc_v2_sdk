@@ -17,27 +17,9 @@ namespace CenturyLinkCloudSdk.UAT.Mock
                 Username = A,
                 Password = "passA",
                 AccountAlias = "aliasA",
-                RecentActivity = new List<MockActivity>
-                {
-                    new MockActivity
-                    {
-                        AccountAlias = "aliasA",
-                        AccountDescription = "CLC Virtual Block Storage",
-                        Body = "Roles updated to: AccountAdmin",
-                        CreatedBy = "admin",
-                        CreatedDate = DateTime.Now,
-                        EntityId = 1,
-                        EntityType = "User",
-                        LocationAlias = "VA1",
-                        ReferenceId = "VA1aliasACI01",
-                        Subject = "Server VA1T3BKCI01 Configuration Updated"
-                    }
-                },
-                DataCentersById = new Dictionary<string, MockDataCenter>
-                {
-                    {DataCenters.DCA.Id, DataCenters.DCA},
-                    {DataCenters.DCB.Id, DataCenters.DCB},
-                }
+                RecentActivity = new List<MockActivity>(),
+                DataCentersById = new Dictionary<string, MockDataCenter>(),
+                AlertPolicies = new List<MockAlertPolicy>()
             };
 
             UserB = new User
@@ -45,29 +27,12 @@ namespace CenturyLinkCloudSdk.UAT.Mock
                 Username = B,
                 Password = "passB",
                 AccountAlias = "aliasB",
-                RecentActivity = new List<MockActivity>
-                {
-                    new MockActivity
-                    {
-                        AccountAlias = "aliasB",
-                        AccountDescription = "CLC Virtual Block Storage",
-                        Body = "Server X Deleted by admin",
-                        CreatedBy = "admin",
-                        CreatedDate = DateTime.Now,
-                        EntityId = 2,
-                        EntityType = "Server",
-                        LocationAlias = "VA1",
-                        ReferenceId = "VA1aliasBCI01",
-                        Subject = "Server VA1T3BKCI01 Configuration Updated"
-                    }
-                },
-                DataCentersById = new Dictionary<string, MockDataCenter>
-                {
-                    {DataCenters.DCB.Id, DataCenters.DCB},
-                }
+                RecentActivity = new List<MockActivity>(),
+                DataCentersById = new Dictionary<string, MockDataCenter>(),
+                AlertPolicies = new List<MockAlertPolicy>()
             };
-            
-            All = new List<User>{ UserA, UserB };
+
+            All = new List<User> { UserA, UserB };
             ByUsername = All.ToDictionary(user => user.Username);
             ByAccountAlias = All.ToDictionary(user => user.AccountAlias);
         }
@@ -81,6 +46,16 @@ namespace CenturyLinkCloudSdk.UAT.Mock
         public static User Login(string username, string password)
         {
             return All.FirstOrDefault(x => x.Username.Equals(username) && x.Password.Equals(password));
+        }
+
+        public static void Reset()
+        {
+            All.ForEach(u =>
+            {
+                u.AlertPolicies.Clear();
+                u.DataCentersById.Clear();
+                u.RecentActivity.Clear();
+            });
         }
     }
 

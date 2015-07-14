@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using CenturyLinkCloudSdk.Models;
@@ -27,7 +28,8 @@ namespace CenturyLinkCloudSdk.UAT
         public void GetAccountTotalAssets_CalculatesDataCenters_ForAccountAlias(string username)
         {
             Given_I_Am(username);
-            
+            Given_I_Have_Data_Centers();
+
             When_I_Request_Asset_Totals();
 
             Then_I_Receive_Totals_For_My_Data_Centers();
@@ -37,10 +39,62 @@ namespace CenturyLinkCloudSdk.UAT
         public void GetRecentActivity_RequestsLimitedRecords_ForSpecifiedUsers()
         {
             Given_I_Am(Users.A);
+            Given_There_Is_Recent_Activity();
 
             When_I_Request_Activity_For(Users.A, Users.B);
             
             Then_I_Recieve_Activity_For(Users.A, Users.B);
+        }
+
+        private void Given_I_Have_Data_Centers()
+        {
+            Users.UserA.DataCentersById = new Dictionary<string, MockDataCenter>
+            {
+                {DataCenters.DCA.Id, DataCenters.DCA},
+                {DataCenters.DCB.Id, DataCenters.DCB},
+            };
+
+            Users.UserB.DataCentersById = new Dictionary<string, MockDataCenter>
+            {
+                {DataCenters.DCB.Id, DataCenters.DCB},
+            };
+        }
+
+        private void Given_There_Is_Recent_Activity()
+        {
+            Users.UserA.RecentActivity = new List<MockActivity>
+            {
+                new MockActivity
+                {
+                    AccountAlias = "aliasA",
+                    AccountDescription = "CLC Virtual Block Storage",
+                    Body = "Roles updated to: AccountAdmin",
+                    CreatedBy = "admin",
+                    CreatedDate = DateTime.Now,
+                    EntityId = 1,
+                    EntityType = "User",
+                    LocationAlias = "VA1",
+                    ReferenceId = "VA1aliasACI01",
+                    Subject = "Server VA1T3BKCI01 Configuration Updated"
+                }
+            };
+
+            Users.UserB.RecentActivity = new List<MockActivity>
+            {
+                new MockActivity
+                {
+                    AccountAlias = "aliasB",
+                    AccountDescription = "CLC Virtual Block Storage",
+                    Body = "Server X Deleted by admin",
+                    CreatedBy = "admin",
+                    CreatedDate = DateTime.Now,
+                    EntityId = 2,
+                    EntityType = "Server",
+                    LocationAlias = "VA1",
+                    ReferenceId = "VA1aliasBCI01",
+                    Subject = "Server VA1T3BKCI01 Configuration Updated"
+                }
+            };
         }
 
         private void When_I_Request_Activity_For(params string[] usernames)
