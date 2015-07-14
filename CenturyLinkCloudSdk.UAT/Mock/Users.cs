@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CenturyLinkCloudSdk.UAT.Mock.Controllers;
 
 namespace CenturyLinkCloudSdk.UAT.Mock
 {
@@ -89,7 +90,8 @@ namespace CenturyLinkCloudSdk.UAT.Mock
         public string Password { get; set; }
         public string AccountAlias { get; set; }
         public List<MockActivity> RecentActivity { get; set; }
-        public Dictionary<string, MockDataCenter> DataCentersById { get; set; } 
+        public Dictionary<string, MockDataCenter> DataCentersById { get; set; }
+        public List<MockAlertPolicy> AlertPolicies { get; set; } 
     }
 
     public class MockActivity
