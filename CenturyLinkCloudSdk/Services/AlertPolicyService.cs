@@ -26,9 +26,10 @@ namespace CenturyLinkCloudSdk.Services
         public async Task<AlertPolicy> Create(AlertPolicyDefniition definition, CancellationToken cancellationToken = new CancellationToken())
         {
             var alias = await _aliasProvider.GetAccountAlias();
-            var requestUri = String.Format("alertpolicies/{0}", alias);
+            
+            cancellationToken.ThrowIfCancellationRequested();
 
-            return await _httpClient.PostAsync<AlertPolicy>(requestUri, definition, cancellationToken);
+            return await _httpClient.PostAsync<AlertPolicy>(String.Format("alertpolicies/{0}", alias), definition, cancellationToken);
         }
     }
 }

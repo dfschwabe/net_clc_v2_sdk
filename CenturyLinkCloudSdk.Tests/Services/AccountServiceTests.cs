@@ -71,7 +71,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
         }
 
         [Test]
-        public void GetAccountTotalAssets_Aborts_OnTaskCancellation()
+        public void GetAccountTotalAssets_Aborts_OnTokenCancellation()
         {
             var tokenSource = new CancellationTokenSource();
 
@@ -80,7 +80,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
                 .Returns(Task.FromResult(new DataCenter { Totals = new TotalAssets() }));
 
 
-            Assert.Throws<AggregateException>(() =>_testObject.GetAccountTotalAssets(new List<string> { CenterId1, CenterId2 }, tokenSource.Token).Wait());
+            Assert.Throws<AggregateException>(() =>_testObject.GetAccountTotalAssets(new List<string> { CenterId1, CenterId2 }, tokenSource.Token).Await());
 
             _client.Verify(x => x.GetAsync<DataCenter>(It.IsAny<string>(), tokenSource.Token), Times.Once);
         }
@@ -118,7 +118,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
         }
 
         [Test]
-        public void GetRecentActivity_Aborts_OnTaskCancellation()
+        public void GetRecentActivity_Aborts_OnTokenCancellation()
         {
             var tokenSource = new CancellationTokenSource();
 

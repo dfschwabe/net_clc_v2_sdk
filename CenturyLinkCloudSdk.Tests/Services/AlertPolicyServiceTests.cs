@@ -55,5 +55,21 @@ namespace CenturyLinkCloudSdk.Tests.Services
 
             Assert.AreSame(expectedResult, actualResult);
         }
+
+        [Test]
+        public void Create_Aborts_OnTokenCancellation()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            _aliasProvider.Setup(x => x.GetAccountAlias())
+                          .Callback(() => tokenSource.Cancel(true))
+                          .Returns(Task.FromResult(AccountAlias));
+
+            Assert.Throws<TaskCanceledException>(() => _testObject.Create(new AlertPolicy(), tokenSource.Token).Await());
+
+            _client.Verify(x => x.PostAsync<AlertPolicy>(It.IsAny<string>(), It.IsAny<AlertPolicyDefniition>(), It.IsAny<CancellationToken>())
+                                 , Times.Never);
+
+        }
     }
 }
