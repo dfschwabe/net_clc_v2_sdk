@@ -29,7 +29,7 @@ namespace CenturyLinkCloudSdk.UAT
 
         private void When_I_Create_A_New_Policy()
         {
-            _policyDefinition = GetPolicyDefinition();
+            _policyDefinition = BuildPolicyDefinition();
 
             _policyResult = ServiceFactory.CreateAlertPolicyService().Create(_policyDefinition, CancellationToken.None).Result;
         }
@@ -48,12 +48,12 @@ namespace CenturyLinkCloudSdk.UAT
             Assert.NotNull(policy);
             Assert.AreEqual(policy.id, _policyResult.Id);
             Assert.AreEqual(_policyDefinition.Name, policy.name);
-            AssertActionsEqual(_policyDefinition.Actions, policy.actions);
-            AssertTriggersEqual(_policyDefinition.Triggers, policy.triggers);
+            AssertMockActionsEqual(_policyDefinition.Actions, policy.actions);
+            AssertMockTriggersEqual(_policyDefinition.Triggers, policy.triggers);
 
         }
 
-        private static void AssertActionsEqual(IEnumerable<AlertAction> expected, IEnumerable<MockAlertAction> actual)
+        private static void AssertMockActionsEqual(IEnumerable<AlertAction> expected, IEnumerable<MockAlertAction> actual)
         {
             expected.ToList().ForEach(e =>
             {
@@ -64,14 +64,14 @@ namespace CenturyLinkCloudSdk.UAT
             });
         }
 
-        private void AssertTriggersEqual(IEnumerable<AlertTrigger> expected, IEnumerable<MockAlertTrigger> actual)
+        private void AssertMockTriggersEqual(IEnumerable<AlertTrigger> expected, IEnumerable<MockAlertTrigger> actual)
         {
             Assert.True(expected.All(e => actual.Any(a => a.duration.Equals(e.Duration)
                                                           && a.metric.Equals(e.Metric.ToString().ToLower())
                                                           && a.threshold.Equals(a.threshold))));
         }
 
-        private static AlertPolicyDefniition GetPolicyDefinition()
+        private static AlertPolicyDefniition BuildPolicyDefinition()
         {
             return new AlertPolicyDefniition
             {
