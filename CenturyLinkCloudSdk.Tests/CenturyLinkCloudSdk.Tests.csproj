@@ -66,6 +66,7 @@
     <Compile Include="Runtime\Client\HttpClientWrapperTests.cs" />
     <Compile Include="Runtime\Client\JsonMediaTypeHandlerTests.cs" />
     <Compile Include="Services\AccountServiceTests.cs" />
+    <Compile Include="Services\AlertPolicyServiceTests.cs" />
     <Compile Include="TestExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
