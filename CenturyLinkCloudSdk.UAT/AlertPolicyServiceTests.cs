@@ -83,7 +83,11 @@ namespace CenturyLinkCloudSdk.UAT
                         Action = AlertActionType.Email,
                         Settings = new AlertActionSettings
                         {
-                            Recipients = new List<string>()
+                            Recipients = new List<string>
+                            {
+                                "r1@domain.com",
+                                "r2@domain.com",
+                            }
                         }
                     }
                 },
