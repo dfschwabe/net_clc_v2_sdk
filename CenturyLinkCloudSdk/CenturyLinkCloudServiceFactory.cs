@@ -41,5 +41,10 @@ namespace CenturyLinkCloudSdk
         {
             return new AccountService(_clientWrapper, _authenticationProvider);
         }
+
+        public ICenturyLinkCloudAlertPolicyService CreateAlertPolicyService()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
