@@ -92,8 +92,8 @@ namespace CenturyLinkCloudSdk.Tests.Services
             ActivityFilter actualFilter = null;
             var expectedToken = new CancellationTokenSource().Token;
 
-            _client.Setup(x => x.PostAsync<ActivityFilter, IEnumerable<Activity>>("search/activities", It.IsAny<ActivityFilter>(), expectedToken))
-                   .Callback<string, ActivityFilter, CancellationToken>((uri,filter,token) => actualFilter = filter)
+            _client.Setup(x => x.PostAsync<IEnumerable<Activity>>("search/activities", It.IsAny<ActivityFilter>(), expectedToken))
+                   .Callback<string, object, CancellationToken>((uri, filter, token) => actualFilter = filter as ActivityFilter)
                    .Returns(Task.FromResult(new List<Activity>().AsEnumerable()));
 
             _testObject.GetRecentActivity(expectedFilter.Limit, expectedToken).Wait();
@@ -109,7 +109,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
         {
             var expectedResult = new List<Activity>().AsEnumerable();
 
-            _client.Setup(x => x.PostAsync<ActivityFilter, IEnumerable<Activity>>(It.IsAny<string>(), It.IsAny<ActivityFilter>(), It.IsAny<CancellationToken>()))
+            _client.Setup(x => x.PostAsync<IEnumerable<Activity>>(It.IsAny<string>(), It.IsAny<ActivityFilter>(), It.IsAny<CancellationToken>()))
                    .Returns(Task.FromResult(expectedResult));
 
             var actualResult = _testObject.GetRecentActivity(1, CancellationToken.None).Result;
@@ -128,7 +128,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
 
             Assert.Throws<TaskCanceledException>(() => _testObject.GetRecentActivity(5, tokenSource.Token).Await());
 
-            _client.Verify(x => x.PostAsync<ActivityFilter, IEnumerable<Activity>>(It.IsAny<string>(), It.IsAny<ActivityFilter>(), It.IsAny<CancellationToken>())
+            _client.Verify(x => x.PostAsync<IEnumerable<Activity>>(It.IsAny<string>(), It.IsAny<ActivityFilter>(), It.IsAny<CancellationToken>())
                                  , Times.Never);
         }
 
@@ -139,8 +139,8 @@ namespace CenturyLinkCloudSdk.Tests.Services
             ActivityFilter actualFilter = null;
             var expectedToken = new CancellationTokenSource().Token;
 
-            _client.Setup(x => x.PostAsync<ActivityFilter, IEnumerable<Activity>>("search/activities", It.IsAny<ActivityFilter>(), expectedToken))
-                   .Callback<string, ActivityFilter, CancellationToken>((uri,filter,token) => actualFilter = filter)
+            _client.Setup(x => x.PostAsync<IEnumerable<Activity>>("search/activities", It.IsAny<ActivityFilter>(), expectedToken))
+                   .Callback<string, object, CancellationToken>((uri, filter, token) => actualFilter = filter as ActivityFilter)
                    .Returns(Task.FromResult(new List<Activity>().AsEnumerable()));
 
             _testObject.GetRecentActivityByAccountAlias(expectedFilter.Accounts, expectedFilter.Limit, expectedToken).Wait();
@@ -156,7 +156,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
         {
             var expectedResult = new List<Activity>().AsEnumerable();
 
-            _client.Setup(x => x.PostAsync<ActivityFilter, IEnumerable<Activity>>(It.IsAny<string>(), It.IsAny<ActivityFilter>(), It.IsAny<CancellationToken>()))
+            _client.Setup(x => x.PostAsync<IEnumerable<Activity>>(It.IsAny<string>(), It.IsAny<ActivityFilter>(), It.IsAny<CancellationToken>()))
                    .Returns(Task.FromResult(expectedResult));
 
             var actualResult = _testObject.GetRecentActivityByAccountAlias(new List<string>(), 1, CancellationToken.None).Result;

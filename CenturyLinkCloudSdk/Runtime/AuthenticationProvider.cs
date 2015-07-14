@@ -48,7 +48,7 @@ namespace CenturyLinkCloudSdk.Runtime
 
             if (_authentication == null)
             {
-                _authentication = await _client.PostAsync<LoginRequest, Authentication>("authentication/login", loginRequest, CancellationToken.None);
+                _authentication = await _client.PostAsync<Authentication>("authentication/login", loginRequest, CancellationToken.None);
             }
 
             return _authentication;

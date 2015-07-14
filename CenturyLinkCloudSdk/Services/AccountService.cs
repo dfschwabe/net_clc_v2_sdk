@@ -49,7 +49,7 @@ namespace CenturyLinkCloudSdk.Services
         {
             var filter = new ActivityFilter {Accounts = aliases, Limit = recordCountLimit};
          
-            return await _httpClient.PostAsync<ActivityFilter, IEnumerable<Activity>>("search/activities", filter, cancellationToken);
+            return await _httpClient.PostAsync<IEnumerable<Activity>>("search/activities", filter, cancellationToken);
         }
 
         private async Task<DataCenter> GetDatacenter(string alias, string id, CancellationToken cancellationToken)

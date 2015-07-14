@@ -97,7 +97,7 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
                          .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(string.Empty) }))
                          .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualRequest = request);
 
-            _testObject.PostAsync<string, string>("path/id", string.Empty, CancellationToken.None).Wait();
+            _testObject.PostAsync<string>("path/id", string.Empty, CancellationToken.None).Wait();
 
             Assert.NotNull(actualRequest);
             Assert.AreEqual(HttpMethod.Post, actualRequest.Method);
@@ -116,7 +116,7 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
                          .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(string.Empty) }))
                          .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualBody = request.Content.ReadAsStringAsync().Result);
 
-            _testObject.PostAsync<Poco, string>("path/id", expectedBody, CancellationToken.None).Wait();
+            _testObject.PostAsync<string>("path/id", expectedBody, CancellationToken.None).Wait();
 
             Assert.NotNull(actualBody);
             Assert.AreEqual(JsonConvert.SerializeObject(expectedBody, _serializerSettings), actualBody);
@@ -132,7 +132,7 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
                          .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(JsonConvert.SerializeObject(expectedResponseBody)) }));
 
 
-            var actual = _testObject.PostAsync<Poco, Poco>("path/id", new Poco(), CancellationToken.None).Result;
+            var actual = _testObject.PostAsync<Poco>("path/id", new Poco(), CancellationToken.None).Result;
 
             Assert.AreEqual(expectedResponseBody.P1, actual.P1);
 
@@ -150,7 +150,7 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
 
             try
             {
-                _testObject.PostAsync<Poco, Poco>(string.Empty, new Poco(),  CancellationToken.None).Await();
+                _testObject.PostAsync<Poco>(string.Empty, new Poco(),  CancellationToken.None).Await();
 
                 Assert.Fail();
             }
