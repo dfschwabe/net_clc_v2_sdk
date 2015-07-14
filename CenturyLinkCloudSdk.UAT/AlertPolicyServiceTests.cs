@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -36,8 +37,8 @@ namespace CenturyLinkCloudSdk.UAT
         private void Then_I_Recieve_The_New_Policy()
         {
             Assert.AreEqual(_policyDefinition.Name, _policyResult.Name);
-            CollectionAssert.AreEqual(_policyDefinition.Actions, _policyResult.Actions);
-            CollectionAssert.AreEqual(_policyDefinition.Triggers, _policyResult.Triggers);
+            CollectionAssert.AreEqual(_policyDefinition.Actions, _policyResult.Actions, new AlertActionComparer());
+            CollectionAssert.AreEqual(_policyDefinition.Triggers, _policyResult.Triggers, new AlertTriggerComparer());
         }
 
         private void Then_The_New_Policy_Is_Associated_With_My_Account()
@@ -102,6 +103,43 @@ namespace CenturyLinkCloudSdk.UAT
                     }
                 }
             };
+        }
+    }
+
+    public class AlertActionComparer : IComparer
+    {
+        public int Compare(object x, object y)
+        {
+            var a1 = x as AlertAction;
+            var a2 = y as AlertAction;
+
+            if (!a1.Action.Equals(a2.Action))
+                return 1;
+
+            if (!a1.Settings.Recipients.SequenceEqual(a2.Settings.Recipients))
+                return 1;
+
+            return 0;
+        }
+    }
+
+    public class AlertTriggerComparer : IComparer
+    {
+        public int Compare(object x, object y)
+        {
+            var a1 = x as AlertTrigger;
+            var a2 = y as AlertTrigger;
+
+            if (!a1.Duration.Equals(a2.Duration))
+                return 1;
+
+            if (!a1.Metric.Equals(a2.Metric))
+                return 1;
+
+            if (!a1.Threshold.Equals(a2.Threshold))
+                return 1;
+
+            return 0;
         }
     }
 }
