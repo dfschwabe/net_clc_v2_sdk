@@ -80,7 +80,7 @@ namespace CenturyLinkCloudSdk.UAT
                 {
                     new AlertAction
                     {
-                        Action = AlertActionType.email,
+                        Action = AlertActionType.Email,
                         Settings = new AlertActionSettings
                         {
                             Recipients = new List<string>()

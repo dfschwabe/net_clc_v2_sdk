@@ -40,7 +40,7 @@ namespace CenturyLinkCloudSdk.Models
 
     public enum AlertActionType
     {
-        email
+        Email
     }
 
     public enum AlertTriggerMetric

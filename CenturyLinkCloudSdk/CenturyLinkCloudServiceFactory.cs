@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using CenturyLinkCloudSdk.Runtime;
 using CenturyLinkCloudSdk.Runtime.Client;
 using CenturyLinkCloudSdk.Services;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 
 namespace CenturyLinkCloudSdk
@@ -22,7 +24,8 @@ namespace CenturyLinkCloudSdk
         {
             var serializerSettings = new JsonSerializerSettings
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                Converters = new List<JsonConverter> { new StringEnumConverter{CamelCaseText = true}}
             };
 
             var authProviderClient = HttpClientFactory.Create(new JsonMediaTypeHandler());
