@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CenturyLinkCloudSdk.Models;
@@ -44,9 +43,13 @@ namespace CenturyLinkCloudSdk.Services
             await _httpClient.DeleteAsync(String.Format("alertpolicies/{0}/{1}", alias, policyId), cancellationToken);
         }
 
-        public Task<AlertPolicyCollection> Get(CancellationToken cancellationToken = new CancellationToken())
+        public async Task<AlertPolicyCollection> Get(CancellationToken cancellationToken = new CancellationToken())
         {
-            throw new NotImplementedException();
+            var alias = await _aliasProvider.GetAccountAlias();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await _httpClient.GetAsync<AlertPolicyCollection>(String.Format("alertpolicies/{0}", alias), cancellationToken);
         }
     }
 }
