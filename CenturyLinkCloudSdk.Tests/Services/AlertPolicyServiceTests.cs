@@ -77,10 +77,11 @@ namespace CenturyLinkCloudSdk.Tests.Services
         {
             var policyId = "policyid";
             var expectedUri = String.Format("alertpolicies/{0}/{1}", AccountAlias, policyId);
-            var expectedBody = new AlertPolicyDefniition();
             var expectedToken = new CancellationTokenSource().Token;
 
-            _client.Setup(x => x.DeleteAsync(expectedUri, expectedToken));
+            _client.Setup(x => x.DeleteAsync(expectedUri, expectedToken))
+                   .Returns(Task.Run(() => { }));
+
 
             _testObject.Delete(policyId, expectedToken).Wait();
 

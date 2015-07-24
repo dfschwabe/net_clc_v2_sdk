@@ -39,7 +39,7 @@ namespace CenturyLinkCloudSdk.Services
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            _httpClient.DeleteAsync(String.Format("alertpolicies/{0}/{1}", alias, policyId), cancellationToken);
+            await _httpClient.DeleteAsync(String.Format("alertpolicies/{0}/{1}", alias, policyId), cancellationToken);
         }
     }
 }
