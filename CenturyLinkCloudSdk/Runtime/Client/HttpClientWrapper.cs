@@ -11,6 +11,7 @@ namespace CenturyLinkCloudSdk.Runtime.Client
         Task<T> GetAsync<T>(string requestUri, CancellationToken cancellationToken);
         Task<TResult> PostAsync<TResult>(string requestUri, object body, CancellationToken cancellationToken);
         Task DeleteAsync(string requestUri, CancellationToken expectedToken);
+        Task<T> PutAsync<T>(string requestUri, object body, CancellationToken cancellationToken);
     }
 
     public class HttpClientWrapper : IHttpClient
@@ -44,6 +45,11 @@ namespace CenturyLinkCloudSdk.Runtime.Client
             var response = await _innerClient.DeleteAsync(requestUri, cancellationToken);
 
             response.EnsureCloudServiceSuccess();
+        }
+
+        public Task<T> PutAsync<T>(string requestUri, object body, CancellationToken cancellationToken)
+        {
+            throw new System.NotImplementedException();
         }
 
         private async Task<T> GetContent<T>(HttpResponseMessage response)
