@@ -17,6 +17,11 @@ namespace CenturyLinkCloudSdk.Models
         public string Id { get; set; }
     }
 
+    public class AlertPolicyCollection
+    {
+        public List<AlertPolicy> Items { get; set; }
+    }
+
     public class AlertAction
     {
         public AlertActionType Action { get; set; }

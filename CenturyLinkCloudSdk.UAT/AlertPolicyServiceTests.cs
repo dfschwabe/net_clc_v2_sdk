@@ -15,6 +15,7 @@ namespace CenturyLinkCloudSdk.UAT
     {
         private AlertPolicyDefniition _policyDefinition;
         private AlertPolicy _policyResult;
+        private AlertPolicyCollection _policyCollectionResult;
 
         [Test]
         public void Create_PostsPolicyDefinition_ToCorrectAccount()
@@ -38,11 +39,31 @@ namespace CenturyLinkCloudSdk.UAT
             Then_The_Policy_Is_Removed_From_My_Account();
         }
 
+        [Test]
+        public void Get_RetreivesAllPolicies()
+        {
+            Given_I_Am(Users.A);
+            Given_I_Have_Multiple_Alert_Policies();
+
+            When_I_Get_My_Policies();
+
+            Then_I_Receive_All_Of_My_Policies();
+        }
+
         private void Given_I_Have_An_Alert_Policy()
         {
             var policy = BuildMockPolicy();
             
             CurrentUser.AlertPolicies.Add(policy.id, policy);
+        }
+
+        private void Given_I_Have_Multiple_Alert_Policies()
+        {
+            var policy1 = BuildMockPolicy();
+            var policy2 = BuildMockPolicy();
+
+            CurrentUser.AlertPolicies.Add(policy1.id, policy1);
+            CurrentUser.AlertPolicies.Add(policy2.id, policy2);
         }
 
         private void When_I_Create_A_New_Policy()
@@ -55,6 +76,11 @@ namespace CenturyLinkCloudSdk.UAT
         private void When_I_Delete_The_Policy()
         {
             ServiceFactory.CreateAlertPolicyService().Delete(CurrentUser.AlertPolicies.First().Key, CancellationToken.None).Wait();
+        }
+
+        private void When_I_Get_My_Policies()
+        {
+            _policyCollectionResult = ServiceFactory.CreateAlertPolicyService().Get(CancellationToken.None).Result;
         }
 
         private void Then_I_Recieve_The_New_Policy()
@@ -81,6 +107,23 @@ namespace CenturyLinkCloudSdk.UAT
             CollectionAssert.IsEmpty(CurrentUser.AlertPolicies);
         }
 
+
+        private void Then_I_Receive_All_Of_My_Policies()
+        {
+            Action<MockAlertPolicy, AlertPolicy> assertEqual = (mock, policy) =>
+            {
+                Assert.AreEqual(policy.Id, mock.id);
+                Assert.AreEqual(policy.Name, mock.name);
+                AssertMockActionsEqual(policy.Actions, mock.actions);
+                AssertMockTriggersEqual(policy.Triggers, mock.triggers);
+            };
+
+            CurrentUser.AlertPolicies.Values.ToList().ForEach(mockPolicy =>
+            {
+                var receivedPolicy = _policyCollectionResult.Items.Single(p => p.Id.Equals(mockPolicy.id));
+                assertEqual(mockPolicy, receivedPolicy);
+            });
+        }
 
         private static void AssertMockActionsEqual(IEnumerable<AlertAction> expected, IEnumerable<MockAlertAction> actual)
         {
