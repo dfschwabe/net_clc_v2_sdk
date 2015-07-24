@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 
@@ -15,6 +16,8 @@ namespace CenturyLinkCloudSdk
 
         public HttpStatusCode StatusCode { get; private set; }
         public string ReasonPhrase { get; private set; }
+        public string ErrorMessage { get; set; }
+        public Dictionary<string,string[]> ValidationErrors { get; set; }
         public string Request { get; private set; }
     }
 }
