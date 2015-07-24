@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using CenturyLinkCloudSdk.Models.Internal;
 using CenturyLinkCloudSdk.Runtime.Client;
 using Moq;
 using Moq.Protected;
@@ -67,24 +70,41 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
         public void GetAsync_Throws_OnFailedRequest()
         {
             var responseMessage = new HttpRequestMessage(HttpMethod.Get, "path/id")
-                                    .CreateResponse(HttpStatusCode.NotFound);
+                .CreateResponse(HttpStatusCode.NotFound);
+
+            _innerHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .Returns(Task.FromResult(responseMessage));
+
+
+            var ex = Assert.Throws<CloudServiceException>(() => _testObject.GetAsync<Poco>(string.Empty, CancellationToken.None).Await());
+
+
+            Assert.AreEqual(responseMessage.StatusCode, ex.StatusCode);
+            Assert.AreEqual(responseMessage.ReasonPhrase, ex.ReasonPhrase);
+            Assert.AreEqual("GET:" + "path/id", ex.Request);
+        }
+
+        [Test]
+        public void GetAsync_IncludesErrorReason_WhenPresent()
+        {
+            var errorReason = BuildErrorReason();
 
             _innerHandler.Protected()
                          .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                         .Returns(Task.FromResult(responseMessage));
+                         .Returns(Task.FromResult(
+                                new HttpResponseMessage{
+                                    RequestMessage = new HttpRequestMessage(),
+                                    StatusCode = HttpStatusCode.BadRequest, 
+                                    Content = new StringContent(JsonConvert.SerializeObject(errorReason))
+                                }));
 
-            try
-            {
-                _testObject.GetAsync<Poco>(string.Empty, CancellationToken.None).Await();
-                
-                Assert.Fail();
-            }
-            catch (CloudServiceException ex)
-            {
-                Assert.AreEqual(responseMessage.StatusCode, ex.StatusCode);
-                Assert.AreEqual(responseMessage.ReasonPhrase, ex.ReasonPhrase);
-                Assert.AreEqual("GET:" + "path/id", ex.Request);
-            }
+
+            var ex = Assert.Throws<CloudServiceException>(() => _testObject.GetAsync<Poco>(string.Empty, CancellationToken.None).Await());
+
+
+            Assert.AreEqual(errorReason.Message, ex.ErrorMessage);
+            Assert.AreEqual(errorReason.ModelState.ToList(), ex.ValidationErrors.ToList());
         }
 
         [Test]
@@ -139,27 +159,59 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
         }
 
         [Test]
-        public void PostAsync_OnFailedRequest()
+        public void PostAsync_Throws_OnFailedRequest()
         {
             var responseMessage = new HttpRequestMessage(HttpMethod.Post, "path/id")
-                                    .CreateResponse(HttpStatusCode.NotFound);
+                .CreateResponse(HttpStatusCode.NotFound);
+
+            _innerHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                    ItExpr.IsAny<CancellationToken>())
+                .Returns(Task.FromResult(responseMessage));
+
+            
+            var ex = Assert.Throws<CloudServiceException>(() => _testObject.PostAsync<Poco>(string.Empty, new Poco(), CancellationToken.None).Await());
+
+
+            Assert.AreEqual(responseMessage.StatusCode, ex.StatusCode);
+            Assert.AreEqual(responseMessage.ReasonPhrase, ex.ReasonPhrase);
+            Assert.AreEqual("POST:" + "path/id", ex.Request);
+        }
+
+        [Test]
+        public void PostAsync_IncludesErrorReason_WhenPresent()
+        {
+            var errorReason = BuildErrorReason();
 
             _innerHandler.Protected()
                          .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
-                         .Returns(Task.FromResult(responseMessage));
+                         .Returns(Task.FromResult(
+                                new HttpResponseMessage
+                                {
+                                    RequestMessage = new HttpRequestMessage(),
+                                    StatusCode = HttpStatusCode.BadRequest,
+                                    Content = new StringContent(JsonConvert.SerializeObject(errorReason))
+                                }));
 
-            try
-            {
-                _testObject.PostAsync<Poco>(string.Empty, new Poco(),  CancellationToken.None).Await();
 
-                Assert.Fail();
-            }
-            catch (CloudServiceException ex)
+            var ex = Assert.Throws<CloudServiceException>(() => _testObject.PostAsync<Poco>(string.Empty, new Poco(), CancellationToken.None).Await());
+
+
+            Assert.AreEqual(errorReason.Message, ex.ErrorMessage);
+            Assert.AreEqual(errorReason.ModelState.ToList(), ex.ValidationErrors.ToList());
+        }
+
+        private static ErrorReason BuildErrorReason()
+        {
+            return new ErrorReason
             {
-                Assert.AreEqual(responseMessage.StatusCode, ex.StatusCode);
-                Assert.AreEqual(responseMessage.ReasonPhrase, ex.ReasonPhrase);
-                Assert.AreEqual("POST:" + "path/id", ex.Request);
-            }
+                Message = "message",
+                ModelState = new Dictionary<string, string[]>
+                {
+                    { "fieldA", new[] {"error1", "error2"} },
+                    { "fieldB", new[] {"error1"} }
+                }
+            };
         }
     }
 
