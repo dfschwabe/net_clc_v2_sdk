@@ -201,6 +201,66 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
             Assert.AreEqual(errorReason.ModelState.ToList(), ex.ValidationErrors.ToList());
         }
 
+        [Test]
+        public void DeleteAsync_PerformsCorrectRequest()
+        {
+            HttpRequestMessage actualRequest = null;
+
+            _innerHandler.Protected()
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(new HttpResponseMessage()))
+                         .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualRequest = request);
+
+            _testObject.DeleteAsync("path/id", CancellationToken.None).Wait();
+
+            Assert.NotNull(actualRequest);
+            Assert.AreEqual(HttpMethod.Delete, actualRequest.Method);
+            Assert.AreEqual(BaseAddress + "/path/id", actualRequest.RequestUri.ToString());
+        }
+
+        [Test]
+        public void DeleteAsync_Throws_OnFailedRequest()
+        {
+            var responseMessage = new HttpRequestMessage(HttpMethod.Delete, "path/id")
+                .CreateResponse(HttpStatusCode.NotFound);
+
+            _innerHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .Returns(Task.FromResult(responseMessage));
+
+
+            var ex = Assert.Throws<CloudServiceException>(() => _testObject.DeleteAsync(string.Empty, CancellationToken.None).Await());
+
+
+            Assert.AreEqual(responseMessage.StatusCode, ex.StatusCode);
+            Assert.AreEqual(responseMessage.ReasonPhrase, ex.ReasonPhrase);
+            Assert.AreEqual("DELETE:" + "path/id", ex.Request);
+        }
+
+        [Test]
+        public void DeleteAsync_IncludesErrorReason_WhenPresent()
+        {
+            var errorReason = BuildErrorReason();
+
+            _innerHandler.Protected()
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(
+                                new HttpResponseMessage
+                                {
+                                    RequestMessage = new HttpRequestMessage(),
+                                    StatusCode = HttpStatusCode.BadRequest,
+                                    Content = new StringContent(JsonConvert.SerializeObject(errorReason))
+                                }));
+
+
+            var ex = Assert.Throws<CloudServiceException>(() => _testObject.DeleteAsync(string.Empty, CancellationToken.None).Await());
+
+
+            Assert.AreEqual(errorReason.Message, ex.ErrorMessage);
+            Assert.AreEqual(errorReason.ModelState.ToList(), ex.ValidationErrors.ToList());
+        }
+
+
         private static ErrorReason BuildErrorReason()
         {
             return new ErrorReason

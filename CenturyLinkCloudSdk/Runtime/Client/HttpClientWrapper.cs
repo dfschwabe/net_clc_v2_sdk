@@ -39,9 +39,11 @@ namespace CenturyLinkCloudSdk.Runtime.Client
             return await GetContent<TResult>(response);
         }
 
-        public Task DeleteAsync(string requestUri, CancellationToken expectedToken)
+        public async Task DeleteAsync(string requestUri, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var response = await _innerClient.DeleteAsync(requestUri, cancellationToken);
+
+            response.EnsureCloudServiceSuccess();
         }
 
         private async Task<T> GetContent<T>(HttpResponseMessage response)
