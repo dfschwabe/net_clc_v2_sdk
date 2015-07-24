@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using CenturyLinkCloudSdk.Models;
-using CenturyLinkCloudSdk.Services;
 using CenturyLinkCloudSdk.UAT.Mock;
 using CenturyLinkCloudSdk.UAT.Mock.Controllers;
 using NUnit.Framework;

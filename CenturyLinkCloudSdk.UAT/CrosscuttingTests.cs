@@ -14,7 +14,7 @@ namespace CenturyLinkCloudSdk.UAT
     public class CrosscuttingTests : FixtureBase
     {
         private AggregateException _exceptionResult;
-        private ErrorResponse _errorResponse;
+        private MockErrorResponse _mockErrorResponse;
 
         [Test]
         public void Create_ThrowsDetailedException_OnBadRequest()
@@ -28,10 +28,10 @@ namespace CenturyLinkCloudSdk.UAT
 
         private void When_My_Invocation_Results_In_An_Invalid_Request()
         {
-            _errorResponse = new ErrorResponse
+            _mockErrorResponse = new MockErrorResponse
             {
                 StatusCode = HttpStatusCode.BadRequest,
-                Reason = new ErrorReason
+                Reason = new MockErrorReason
                 {
                     message = "The request is invalid.",
                     modelState = new Dictionary<string, string[]>
@@ -42,7 +42,7 @@ namespace CenturyLinkCloudSdk.UAT
                 }
             };
 
-            AuthenticationController.Error = _errorResponse;
+            AuthenticationController.MockError = _mockErrorResponse;
 
             _exceptionResult = Assert.Throws<AggregateException>(
                 () => ServiceFactory.CreateAlertPolicyService().Create(new AlertPolicyDefniition(), CancellationToken.None).Wait()
@@ -58,8 +58,8 @@ namespace CenturyLinkCloudSdk.UAT
             Assert.NotNull(serviceException);
             Assert.AreEqual(HttpStatusCode.BadRequest, serviceException.StatusCode);
             Assert.AreEqual("Bad Request", serviceException.ReasonPhrase);
-            Assert.AreEqual(_errorResponse.Reason.message, serviceException.ErrorMessage);
-            Assert.AreEqual(_errorResponse.Reason.modelState.ToList(), serviceException.ValidationErrors.ToList());
+            Assert.AreEqual(_mockErrorResponse.Reason.message, serviceException.ErrorMessage);
+            Assert.AreEqual(_mockErrorResponse.Reason.modelState.ToList(), serviceException.ValidationErrors.ToList());
         }
     }
 }

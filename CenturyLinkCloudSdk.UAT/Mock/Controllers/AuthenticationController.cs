@@ -11,22 +11,22 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
     public class AuthenticationController : ApiController
     {
         public const string Token = "eyJpc3MiOiJ1cm46YXBpLXRpZXIzIiwiYXVk.eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9IjoidXJuOnRpZXIzLXVzZXJzIiwibmJmIjoxNDM1NzE1MzYxLCJleHAiOjE0MzY5MjQ5NjEsInJvbGUiOiJBY2NvdW50QWRtaW4iLCJ1bmlxdWVfbmFtZSI6ImRzY2h3YWJlLnQzYmsiLCJ1cm46dGllcjM6YWNjb3VudC1hbGlhcyI6IlQzQksiLCJ4y3xTbwelPiPWwRkdjBgNVh4JsvAlFUVwBtLWPV7GOk.1cm46dGllcjM6bG9jYXRpb24tYWxpYXMiOiJWQTEifQ";
-        public static ErrorResponse Error { get; set; }
+        public static MockErrorResponse MockError { get; set; }
 
         [Route("authentication/login")]
         public HttpResponseMessage Post(MockLogin login)
         {
-            if (Error != null)
+            if (MockError != null)
             {
-                var response = Request.CreateResponse(Error.StatusCode, Error.Reason);
-                Error = null;
+                var response = Request.CreateResponse(MockError.StatusCode, MockError.Reason);
+                MockError = null;
                 return response;
             }
 
             User user = Users.Login(login.UserName, login.Password);
             if (user == null)
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest, new ErrorReason { message = "We didn't recognize the username or password you entered. Please try again" });
+                return Request.CreateResponse(HttpStatusCode.BadRequest, new MockErrorReason { message = "We didn't recognize the username or password you entered. Please try again" });
             }
 
             var authentication = new MockAuthentication

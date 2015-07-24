@@ -3,12 +3,12 @@ using System.Net;
 
 namespace CenturyLinkCloudSdk.UAT.Mock
 {
-    public class ErrorResponse
+    public class MockErrorResponse
     {
         public HttpStatusCode StatusCode { get; set; }
-        public ErrorReason Reason { get; set; }
+        public MockErrorReason Reason { get; set; }
     }
-    public class ErrorReason
+    public class MockErrorReason
     {
         public string message { get; set; }
         public Dictionary<string,string[]> modelState { get; set; }
