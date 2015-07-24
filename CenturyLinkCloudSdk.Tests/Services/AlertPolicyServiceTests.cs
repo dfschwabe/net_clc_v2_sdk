@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CenturyLinkCloudSdk.Models;
@@ -142,6 +141,49 @@ namespace CenturyLinkCloudSdk.Tests.Services
             Assert.Throws<TaskCanceledException>(() => _testObject.Get(tokenSource.Token).Await());
 
             _client.Verify(x => x.GetAsync<AlertPolicyCollection>(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+
+        }
+
+        [Test]
+        public void GetById_PerformsCorrectRequest()
+        {
+            var policyId = "policyid";
+            var expectedUri = String.Format("alertpolicies/{0}/{1}", AccountAlias, policyId);
+            var expectedToken = new CancellationTokenSource().Token;
+
+            _client.Setup(x => x.GetAsync<AlertPolicy>(expectedUri, expectedToken))
+                   .Returns(Task.FromResult(new AlertPolicy()));
+
+            _testObject.Get(policyId, expectedToken).Wait();
+
+            _client.VerifyAll();
+        }
+
+        [Test]
+        public void GetById_ReturnsExpectedResult()
+        {
+            var expectedResult = new AlertPolicy();
+
+            _client.Setup(x => x.GetAsync<AlertPolicy>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(expectedResult));
+
+            var actualResult = _testObject.Get("policyid", CancellationToken.None).Result;
+
+            Assert.AreSame(expectedResult, actualResult);
+        }
+
+        [Test]
+        public void GetById_Aborts_OnTokenCancellation()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            _aliasProvider.Setup(x => x.GetAccountAlias())
+                          .Callback(() => tokenSource.Cancel(true))
+                          .Returns(Task.FromResult(AccountAlias));
+
+            Assert.Throws<TaskCanceledException>(() => _testObject.Get("policyid", tokenSource.Token).Await());
+
+            _client.Verify(x => x.GetAsync<AlertPolicy>(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
 
         }
     }

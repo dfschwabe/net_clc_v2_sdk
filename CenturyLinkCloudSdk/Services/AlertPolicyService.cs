@@ -44,9 +44,13 @@ namespace CenturyLinkCloudSdk.Services
             await _httpClient.DeleteAsync(String.Format("alertpolicies/{0}/{1}", alias, policyId), cancellationToken);
         }
 
-        public Task<AlertPolicy> Get(string policyId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<AlertPolicy> Get(string policyId, CancellationToken cancellationToken = new CancellationToken())
         {
-            throw new NotImplementedException();
+            var alias = await _aliasProvider.GetAccountAlias();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return await _httpClient.GetAsync<AlertPolicy>(String.Format("alertpolicies/{0}/{1}", alias, policyId), cancellationToken);
         }
 
         public async Task<AlertPolicyCollection> Get(CancellationToken cancellationToken = new CancellationToken())
