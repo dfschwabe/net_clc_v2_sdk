@@ -10,7 +10,7 @@ namespace CenturyLinkCloudSdk.Services
     public interface ICenturyLinkCloudAlertPolicyService
     {
          Task<AlertPolicy> Create(AlertPolicyDefniition definition, CancellationToken cancellationToken = default(CancellationToken));
-         Task Delete(string key, CancellationToken cancellationToken = default(CancellationToken));
+         Task Delete(string policyId, CancellationToken cancellationToken = default(CancellationToken));
     }
 
     public class AlertPolicyService : ICenturyLinkCloudAlertPolicyService
@@ -33,9 +33,13 @@ namespace CenturyLinkCloudSdk.Services
             return await _httpClient.PostAsync<AlertPolicy>(String.Format("alertpolicies/{0}", alias), definition, cancellationToken);
         }
 
-        public Task Delete(string key, CancellationToken cancellationToken = new CancellationToken())
+        public async Task Delete(string policyId, CancellationToken cancellationToken = new CancellationToken())
         {
-            throw new NotImplementedException();
+            var alias = await _aliasProvider.GetAccountAlias();
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            _httpClient.DeleteAsync(String.Format("alertpolicies/{0}/{1}", alias, policyId), cancellationToken);
         }
     }
 }

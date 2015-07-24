@@ -31,11 +31,11 @@ namespace CenturyLinkCloudSdk.Tests.Services
         [Test]
         public void Create_PerformsCorrectRequest()
         {
-            var requestUri = String.Format("alertpolicies/{0}", AccountAlias);
+            var expectedUri = String.Format("alertpolicies/{0}", AccountAlias);
             var expectedBody = new AlertPolicyDefniition();
             var expectedToken = new CancellationTokenSource().Token;
 
-            _client.Setup(x => x.PostAsync<AlertPolicy>(requestUri, expectedBody, expectedToken))
+            _client.Setup(x => x.PostAsync<AlertPolicy>(expectedUri, expectedBody, expectedToken))
                    .Returns(Task.FromResult(new AlertPolicy()));
 
             _testObject.Create(expectedBody, expectedToken).Wait();
@@ -71,5 +71,35 @@ namespace CenturyLinkCloudSdk.Tests.Services
                                  , Times.Never);
 
         }
+
+        [Test]
+        public void Delete_PerformsCorrectRequest()
+        {
+            var policyId = "policyid";
+            var expectedUri = String.Format("alertpolicies/{0}/{1}", AccountAlias, policyId);
+            var expectedBody = new AlertPolicyDefniition();
+            var expectedToken = new CancellationTokenSource().Token;
+
+            _client.Setup(x => x.DeleteAsync(expectedUri, expectedToken));
+
+            _testObject.Delete(policyId, expectedToken).Wait();
+
+            _client.VerifyAll();
+        }
+
+        [Test]
+        public void Delete_Aborts_OnTokenCancellation()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            _aliasProvider.Setup(x => x.GetAccountAlias())
+                          .Callback(() => tokenSource.Cancel(true))
+                          .Returns(Task.FromResult(AccountAlias));
+
+            Assert.Throws<TaskCanceledException>(() => _testObject.Delete("policyid", tokenSource.Token).Await());
+
+            _client.Verify(x => x.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
     }
 }

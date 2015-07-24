@@ -1,13 +1,22 @@
 ﻿using System;
-using System.Net.Http;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace CenturyLinkCloudSdk.Tests
 {
     public static class TaskExtensions
     {
+        public static void Await(this Task task)
+        {
+            try
+            {
+                task.Wait();
+            }
+            catch (AggregateException ex)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+            }
+        }
         public static T Await<T>(this Task<T> task)
         {
             try
