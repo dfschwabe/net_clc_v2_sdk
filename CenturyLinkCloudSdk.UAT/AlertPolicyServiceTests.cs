@@ -17,6 +17,14 @@ namespace CenturyLinkCloudSdk.UAT
         private AlertPolicy _policyResult;
         private AlertPolicyCollection _policyCollectionResult;
 
+        [SetUp]
+        public void Setup()
+        {
+            _policyDefinition = null;
+            _policyResult = null;
+            _policyCollectionResult = null;
+        }
+
         [Test]
         public void Create_PostsPolicyDefinition_ToCorrectAccount()
         {
