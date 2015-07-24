@@ -94,12 +94,9 @@ namespace CenturyLinkCloudSdk.UAT
         {
             Assert.True(CurrentUser.AlertPolicies.ContainsKey(_policyResult.Id));
             
-            var policy = CurrentUser.AlertPolicies[_policyResult.Id];
-            Assert.AreEqual(policy.id, _policyResult.Id);
-            Assert.AreEqual(_policyDefinition.Name, policy.name);
-            AssertMockActionsEqual(_policyDefinition.Actions, policy.actions);
-            AssertMockTriggersEqual(_policyDefinition.Triggers, policy.triggers);
+            var mockPolicy = CurrentUser.AlertPolicies[_policyResult.Id];
 
+            AssertPoliciesEqual(_policyResult, mockPolicy);
         }
 
         private void Then_The_Policy_Is_Removed_From_My_Account()
@@ -110,19 +107,19 @@ namespace CenturyLinkCloudSdk.UAT
 
         private void Then_I_Receive_All_Of_My_Policies()
         {
-            Action<MockAlertPolicy, AlertPolicy> assertEqual = (mock, policy) =>
-            {
-                Assert.AreEqual(policy.Id, mock.id);
-                Assert.AreEqual(policy.Name, mock.name);
-                AssertMockActionsEqual(policy.Actions, mock.actions);
-                AssertMockTriggersEqual(policy.Triggers, mock.triggers);
-            };
-
             CurrentUser.AlertPolicies.Values.ToList().ForEach(mockPolicy =>
             {
                 var receivedPolicy = _policyCollectionResult.Items.Single(p => p.Id.Equals(mockPolicy.id));
-                assertEqual(mockPolicy, receivedPolicy);
+                AssertPoliciesEqual(receivedPolicy, mockPolicy);
             });
+        }
+
+        private static void AssertPoliciesEqual(AlertPolicy policy, MockAlertPolicy mock)
+        {
+            Assert.AreEqual(policy.Id, mock.id);
+            Assert.AreEqual(policy.Name, mock.name);
+            AssertMockActionsEqual(policy.Actions, mock.actions);
+            AssertMockTriggersEqual(policy.Triggers, mock.triggers);
         }
 
         private static void AssertMockActionsEqual(IEnumerable<AlertAction> expected, IEnumerable<MockAlertAction> actual)
@@ -136,7 +133,7 @@ namespace CenturyLinkCloudSdk.UAT
             });
         }
 
-        private void AssertMockTriggersEqual(IEnumerable<AlertTrigger> expected, IEnumerable<MockAlertTrigger> actual)
+        private static void AssertMockTriggersEqual(IEnumerable<AlertTrigger> expected, IEnumerable<MockAlertTrigger> actual)
         {
             Assert.True(expected.All(e => actual.Any(a => a.duration.Equals(e.Duration)
                                                           && a.metric.Equals(e.Metric.ToString().ToLower())
