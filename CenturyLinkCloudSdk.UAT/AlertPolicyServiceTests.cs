@@ -16,13 +16,6 @@ namespace CenturyLinkCloudSdk.UAT
     {
         private AlertPolicyDefniition _policyDefinition;
         private AlertPolicy _policyResult;
-        private ICenturyLinkCloudAlertPolicyService _policyService;
-
-        [SetUp]
-        public void Setup()
-        {
-            _policyService = ServiceFactory.CreateAlertPolicyService();
-        }
 
         [Test]
         public void Create_PostsPolicyDefinition_ToCorrectAccount()
@@ -57,12 +50,12 @@ namespace CenturyLinkCloudSdk.UAT
         {
             _policyDefinition = BuildPolicyDefinition();
 
-            _policyResult = _policyService.Create(_policyDefinition, CancellationToken.None).Result;
+            _policyResult = ServiceFactory.CreateAlertPolicyService().Create(_policyDefinition, CancellationToken.None).Result;
         }
 
         private void When_I_Delete_The_Policy()
         {
-            _policyService.Delete(CurrentUser.AlertPolicies.First().Key, CancellationToken.None).Wait();
+            ServiceFactory.CreateAlertPolicyService().Delete(CurrentUser.AlertPolicies.First().Key, CancellationToken.None).Wait();
         }
 
         private void Then_I_Recieve_The_New_Policy()
