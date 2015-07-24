@@ -48,6 +48,17 @@ namespace CenturyLinkCloudSdk.UAT
         }
 
         [Test]
+        public void Get_RetrievesSpecifiedPolicy_WhenValidIdSupplied()
+        {
+            Given_I_Am(Users.A);
+            Given_I_Have_An_Alert_Policy();
+
+            When_I_Get_My_Policy();
+
+            Then_I_Receive_My_Policy();
+        }
+
+        [Test]
         public void Get_RetreivesAllPolicies()
         {
             Given_I_Am(Users.A);
@@ -86,6 +97,11 @@ namespace CenturyLinkCloudSdk.UAT
             ServiceFactory.CreateAlertPolicyService().Delete(CurrentUser.AlertPolicies.First().Key, CancellationToken.None).Wait();
         }
 
+        private void When_I_Get_My_Policy()
+        {
+            _policyResult = ServiceFactory.CreateAlertPolicyService().Get(CurrentUser.AlertPolicies.First().Key, CancellationToken.None).Result;
+        }
+
         private void When_I_Get_My_Policies()
         {
             _policyCollectionResult = ServiceFactory.CreateAlertPolicyService().Get(CancellationToken.None).Result;
@@ -112,6 +128,11 @@ namespace CenturyLinkCloudSdk.UAT
             CollectionAssert.IsEmpty(CurrentUser.AlertPolicies);
         }
 
+
+        private void Then_I_Receive_My_Policy()
+        {
+            AssertPoliciesEqual(_policyResult, CurrentUser.AlertPolicies[_policyResult.Id]);
+        }
 
         private void Then_I_Receive_All_Of_My_Policies()
         {
