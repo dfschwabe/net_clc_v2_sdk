@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using CenturyLinkCloudSdk.Models;
+using CenturyLinkCloudSdk.Services;
 using CenturyLinkCloudSdk.UAT.Mock;
 using CenturyLinkCloudSdk.UAT.Mock.Controllers;
 using NUnit.Framework;
@@ -15,6 +16,13 @@ namespace CenturyLinkCloudSdk.UAT
     {
         private AlertPolicyDefniition _policyDefinition;
         private AlertPolicy _policyResult;
+        private ICenturyLinkCloudAlertPolicyService _policyService;
+
+        [SetUp]
+        public void Setup()
+        {
+            _policyService = ServiceFactory.CreateAlertPolicyService();
+        }
 
         [Test]
         public void Create_PostsPolicyDefinition_ToCorrectAccount()
@@ -27,11 +35,34 @@ namespace CenturyLinkCloudSdk.UAT
             Then_The_New_Policy_Is_Associated_With_My_Account();
         }
 
+        [Test]
+        public void Delete_DeletesCorrectPolicy()
+        {
+            Given_I_Am(Users.A);
+            Given_I_Have_An_Alert_Policy();
+
+            When_I_Delete_The_Policy();
+
+            Then_The_Policy_Is_Removed_From_My_Account();
+        }
+
+        private void Given_I_Have_An_Alert_Policy()
+        {
+            var policy = BuildMockPolicy();
+            
+            CurrentUser.AlertPolicies.Add(policy.id, policy);
+        }
+
         private void When_I_Create_A_New_Policy()
         {
             _policyDefinition = BuildPolicyDefinition();
 
-            _policyResult = ServiceFactory.CreateAlertPolicyService().Create(_policyDefinition, CancellationToken.None).Result;
+            _policyResult = _policyService.Create(_policyDefinition, CancellationToken.None).Result;
+        }
+
+        private void When_I_Delete_The_Policy()
+        {
+            _policyService.Delete(CurrentUser.AlertPolicies.First().Key, CancellationToken.None).Wait();
         }
 
         private void Then_I_Recieve_The_New_Policy()
@@ -52,6 +83,12 @@ namespace CenturyLinkCloudSdk.UAT
             AssertMockTriggersEqual(_policyDefinition.Triggers, policy.triggers);
 
         }
+
+        private void Then_The_Policy_Is_Removed_From_My_Account()
+        {
+            CollectionAssert.IsEmpty(CurrentUser.AlertPolicies);
+        }
+
 
         private static void AssertMockActionsEqual(IEnumerable<AlertAction> expected, IEnumerable<MockAlertAction> actual)
         {
@@ -95,15 +132,54 @@ namespace CenturyLinkCloudSdk.UAT
                 {
                     new AlertTrigger
                     {
-                        Duration = new TimeSpan(0,1,2,3),
+                        Duration = new TimeSpan(0, 1, 2, 3),
                         Metric = AlertTriggerMetric.Memory,
                         Threshold = 90
                     },
                     new AlertTrigger
                     {
-                        Duration = new TimeSpan(0,1,2,3),
+                        Duration = new TimeSpan(0, 1, 2, 3),
                         Metric = AlertTriggerMetric.Disk,
                         Threshold = 50
+                    }
+                }
+            };
+        }
+
+        private static MockAlertPolicy BuildMockPolicy()
+        {
+            return new MockAlertPolicy
+            {
+                id = Guid.NewGuid().ToString(),
+                name = "new policy",
+                actions = new List<MockAlertAction>
+                {
+                    new MockAlertAction
+                    {
+                        action = "email",
+                        settings = new MockAlertActionSettings
+                        {
+                            recipients = new List<string>
+                            {
+                                "r1@domain.com",
+                                "r2@domain.com",
+                            }
+                        }
+                    }
+                },
+                triggers = new List<MockAlertTrigger>
+                {
+                    new MockAlertTrigger
+                    {
+                        duration = new TimeSpan(0, 1, 2, 3),
+                        metric = "memory",
+                        threshold = 90
+                    },
+                    new MockAlertTrigger
+                    {
+                        duration = new TimeSpan(0, 1, 2, 3),
+                        metric = "disk",
+                        threshold = 50
                     }
                 }
             };
