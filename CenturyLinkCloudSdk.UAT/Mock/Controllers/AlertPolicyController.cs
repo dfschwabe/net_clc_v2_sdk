@@ -11,7 +11,7 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
     public class AlertPolicyController : ApiController
     {
         [Route("alertpolicies/{alias}")]
-        public HttpResponseMessage Get([FromUri] string alias)
+        public HttpResponseMessage GetPolicies([FromUri] string alias)
         {
             var policies = new MockAlertPolicyCollection
             {
@@ -19,6 +19,12 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
             };
 
             return Request.CreateResponse(HttpStatusCode.OK, policies);
+        }
+
+        [Route("alertpolicies/{alias}/{id}")]
+        public HttpResponseMessage GetPolicy([FromUri] string alias, [FromUri] string id)
+        {
+            return Request.CreateResponse(HttpStatusCode.OK, Users.ByAccountAlias[alias].AlertPolicies[id]);
         }
 
         [Route("alertpolicies/{alias}")]
