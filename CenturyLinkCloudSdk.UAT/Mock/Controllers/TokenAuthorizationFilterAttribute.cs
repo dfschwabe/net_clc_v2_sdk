@@ -13,7 +13,7 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
             if (!headers.Contains("Authorization") || headers.GetValues("Authorization").First() != "Bearer " + AuthenticationController.Token)
             {
                 actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.Unauthorized
-                    , new ErrorResponse{ message = "Authorization has been denied for this request."});
+                    , new ErrorReason{ message = "Authorization has been denied for this request."});
                 
                 return;
             }
