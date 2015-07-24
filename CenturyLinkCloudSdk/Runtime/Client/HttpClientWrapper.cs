@@ -32,12 +32,12 @@ namespace CenturyLinkCloudSdk.Runtime.Client
             return await GetContent<T>(response);
         }
 
-        public async Task<TResult> PostAsync<TResult>(string requestUri, object body, CancellationToken cancellationToken)
+        public async Task<T> PostAsync<T>(string requestUri, object body, CancellationToken cancellationToken)
         {
             var requestContent = new StringContent(JsonConvert.SerializeObject(body, _serializerSettings));
             var response = await _innerClient.PostAsync(requestUri, requestContent, cancellationToken);
 
-            return await GetContent<TResult>(response);
+            return await GetContent<T>(response);
         }
 
         public async Task DeleteAsync(string requestUri, CancellationToken cancellationToken)
@@ -47,9 +47,12 @@ namespace CenturyLinkCloudSdk.Runtime.Client
             response.EnsureCloudServiceSuccess();
         }
 
-        public Task<T> PutAsync<T>(string requestUri, object body, CancellationToken cancellationToken)
+        public async Task<T> PutAsync<T>(string requestUri, object body, CancellationToken cancellationToken)
         {
-            throw new System.NotImplementedException();
+            var requestContent = new StringContent(JsonConvert.SerializeObject(body, _serializerSettings));
+            var response = await _innerClient.PutAsync(requestUri, requestContent, cancellationToken);
+
+            return await GetContent<T>(response);
         }
 
         private async Task<T> GetContent<T>(HttpResponseMessage response)

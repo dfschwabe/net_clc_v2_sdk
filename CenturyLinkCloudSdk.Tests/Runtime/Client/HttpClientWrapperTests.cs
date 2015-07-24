@@ -202,6 +202,99 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
         }
 
         [Test]
+        public void PutAsync_PerformsCorrectRequest()
+        {
+            HttpRequestMessage actualRequest = null;
+
+            _innerHandler.Protected()
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(string.Empty) }))
+                         .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualRequest = request);
+
+            _testObject.PutAsync<string>("path/id", string.Empty, CancellationToken.None).Wait();
+
+            Assert.NotNull(actualRequest);
+            Assert.AreEqual(HttpMethod.Put, actualRequest.Method);
+            Assert.AreEqual(BaseAddress + "/path/id", actualRequest.RequestUri.ToString());
+        }
+
+        [Test]
+        public void PutAsync_PostsCorrectContent()
+        {
+            string actualBody = null;
+            var expectedBody = new Poco {P1 = "request"};
+            
+
+            _innerHandler.Protected()
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(string.Empty) }))
+                         .Callback<HttpRequestMessage, CancellationToken>((request, _) => actualBody = request.Content.ReadAsStringAsync().Result);
+
+            _testObject.PutAsync<string>("path/id", expectedBody, CancellationToken.None).Wait();
+
+            Assert.NotNull(actualBody);
+            Assert.AreEqual(JsonConvert.SerializeObject(expectedBody, _serializerSettings), actualBody);
+        }
+
+        [Test]
+        public void PutAsync_DeserializesResponse()
+        {
+            var expectedResponseBody = new Poco { P1 = "value1" };
+
+            _innerHandler.Protected()
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(new HttpResponseMessage { Content = new StringContent(JsonConvert.SerializeObject(expectedResponseBody)) }));
+
+
+            var actual = _testObject.PutAsync<Poco>("path/id", new Poco(), CancellationToken.None).Result;
+
+            Assert.AreEqual(expectedResponseBody.P1, actual.P1);
+
+        }
+
+        [Test]
+        public void PutAsync_Throws_OnFailedRequest()
+        {
+            var responseMessage = new HttpRequestMessage(HttpMethod.Put, "path/id")
+                .CreateResponse(HttpStatusCode.NotFound);
+
+            _innerHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                .Returns(Task.FromResult(responseMessage));
+
+            
+            var ex = Assert.Throws<CloudServiceException>(() => _testObject.PutAsync<Poco>(string.Empty, new Poco(), CancellationToken.None).Await());
+
+
+            Assert.AreEqual(responseMessage.StatusCode, ex.StatusCode);
+            Assert.AreEqual(responseMessage.ReasonPhrase, ex.ReasonPhrase);
+            Assert.AreEqual("PUT:" + "path/id", ex.Request);
+        }
+
+        [Test]
+        public void PutAsync_IncludesErrorReason_WhenPresent()
+        {
+            var errorReason = BuildErrorReason();
+
+            _innerHandler.Protected()
+                         .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(), ItExpr.IsAny<CancellationToken>())
+                         .Returns(Task.FromResult(
+                                new HttpResponseMessage
+                                {
+                                    RequestMessage = new HttpRequestMessage(),
+                                    StatusCode = HttpStatusCode.BadRequest,
+                                    Content = new StringContent(JsonConvert.SerializeObject(errorReason))
+                                }));
+
+
+            var ex = Assert.Throws<CloudServiceException>(() => _testObject.PutAsync<Poco>(string.Empty, new Poco(), CancellationToken.None).Await());
+
+
+            Assert.AreEqual(errorReason.Message, ex.ErrorMessage);
+            Assert.AreEqual(errorReason.ModelState.ToList(), ex.ValidationErrors.ToList());
+        }
+
+        [Test]
         public void DeleteAsync_PerformsCorrectRequest()
         {
             HttpRequestMessage actualRequest = null;
@@ -259,8 +352,7 @@ namespace CenturyLinkCloudSdk.Tests.Runtime.Client
             Assert.AreEqual(errorReason.Message, ex.ErrorMessage);
             Assert.AreEqual(errorReason.ModelState.ToList(), ex.ValidationErrors.ToList());
         }
-
-
+        
         private static ErrorReason BuildErrorReason()
         {
             return new ErrorReason
