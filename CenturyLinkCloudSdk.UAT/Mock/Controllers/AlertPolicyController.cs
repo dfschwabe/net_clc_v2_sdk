@@ -13,9 +13,17 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
         public HttpResponseMessage Post([FromUri] string alias, [FromBody] MockAlertPolicy policy)
         {
             policy.id = Guid.NewGuid().ToString();
-            Users.ByAccountAlias[alias].AlertPolicies.Add(policy);
+            Users.ByAccountAlias[alias].AlertPolicies.Add(policy.id, policy);
 
             return Request.CreateResponse(HttpStatusCode.OK, policy);
+        }
+
+        [Route("alertpolicies/{alias}/{id}")]
+        public HttpResponseMessage Delete([FromUri] string alias, [FromUri] string id)
+        {
+            Users.ByAccountAlias[alias].AlertPolicies.Remove(id);
+
+            return Request.CreateResponse(HttpStatusCode.NoContent);
         }
     }
 

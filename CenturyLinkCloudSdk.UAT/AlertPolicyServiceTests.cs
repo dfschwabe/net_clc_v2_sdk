@@ -43,9 +43,9 @@ namespace CenturyLinkCloudSdk.UAT
 
         private void Then_The_New_Policy_Is_Associated_With_My_Account()
         {
-            var policy = CurrentUser.AlertPolicies.FirstOrDefault(p => p.name.Equals(_policyDefinition.Name));
-
-            Assert.NotNull(policy);
+            Assert.True(CurrentUser.AlertPolicies.ContainsKey(_policyResult.Id));
+            
+            var policy = CurrentUser.AlertPolicies[_policyResult.Id];
             Assert.AreEqual(policy.id, _policyResult.Id);
             Assert.AreEqual(_policyDefinition.Name, policy.name);
             AssertMockActionsEqual(_policyDefinition.Actions, policy.actions);
