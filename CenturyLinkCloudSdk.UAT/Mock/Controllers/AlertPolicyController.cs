@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -9,6 +10,17 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
     [TokenAuthorizationFilter]
     public class AlertPolicyController : ApiController
     {
+        [Route("alertpolicies/{alias}")]
+        public HttpResponseMessage Get([FromUri] string alias)
+        {
+            var policies = new MockAlertPolicyCollection
+            {
+                items = Users.ByAccountAlias[alias].AlertPolicies.Values.ToList()
+            };
+
+            return Request.CreateResponse(HttpStatusCode.OK, policies);
+        }
+
         [Route("alertpolicies/{alias}")]
         public HttpResponseMessage Post([FromUri] string alias, [FromBody] MockAlertPolicy policy)
         {
@@ -57,5 +69,10 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
         public TimeSpan duration { get; set; }
 
         public int threshold { get; set; }
+    }
+
+    public class MockAlertPolicyCollection
+    {
+        public List<MockAlertPolicy> items { get; set; }
     }
 }
