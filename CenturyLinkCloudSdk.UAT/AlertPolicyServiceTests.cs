@@ -59,6 +59,18 @@ namespace CenturyLinkCloudSdk.UAT
         }
 
         [Test]
+        public void Update_PostsPolicyUpdate_ToCorrectAccount()
+        {
+            Given_I_Am(Users.A);
+            Given_I_Have_An_Alert_Policy();
+
+            When_I_Update_My_Policy();
+
+            Then_I_Recieve_The_Updated_Policy();
+            Then_The_Updated_Policy_Is_Associated_With_My_Account();
+        }
+
+        [Test]
         public void Get_RetreivesAllPolicies()
         {
             Given_I_Am(Users.A);
@@ -92,6 +104,34 @@ namespace CenturyLinkCloudSdk.UAT
             _policyResult = ServiceFactory.CreateAlertPolicyService().Create(_policyDefinition, CancellationToken.None).Result;
         }
 
+        private void When_I_Update_My_Policy()
+        {
+            _policyDefinition = new AlertPolicyDefniition
+            {
+                Name = "updated name",
+                Actions = new List<AlertAction>
+                {
+                    new AlertAction
+                    {
+                        Action = AlertActionType.Email,
+                        Settings = new AlertActionSettings {Recipients = new List<string> {"update@domain.com"}}
+                    }
+                },
+                Triggers = new List<AlertTrigger>
+                {
+                    new AlertTrigger
+                    {
+                        Duration = TimeSpan.FromSeconds(30),
+                        Metric = AlertTriggerMetric.Cpu,
+                        Threshold = 5
+                    }
+                }
+            };
+
+            var existingId = CurrentUser.AlertPolicies.First().Key;
+            _policyResult = ServiceFactory.CreateAlertPolicyService().Update(existingId, _policyDefinition, CancellationToken.None).Result;
+        }
+
         private void When_I_Delete_The_Policy()
         {
             ServiceFactory.CreateAlertPolicyService().Delete(CurrentUser.AlertPolicies.First().Key, CancellationToken.None).Wait();
@@ -114,11 +154,21 @@ namespace CenturyLinkCloudSdk.UAT
             CollectionAssert.AreEqual(_policyDefinition.Triggers, _policyResult.Triggers, new AlertTriggerComparer());
         }
 
+        private void Then_I_Recieve_The_Updated_Policy()
+        {
+            Assert.AreEqual(_policyDefinition.Name, _policyResult.Name);
+            CollectionAssert.AreEqual(_policyDefinition.Actions, _policyResult.Actions, new AlertActionComparer());
+            CollectionAssert.AreEqual(_policyDefinition.Triggers, _policyResult.Triggers, new AlertTriggerComparer());
+        }
+
         private void Then_The_New_Policy_Is_Associated_With_My_Account()
         {
-            Assert.True(CurrentUser.AlertPolicies.ContainsKey(_policyResult.Id));
-            
-            var mockPolicy = CurrentUser.AlertPolicies[_policyResult.Id];
+            Then_The_Updated_Policy_Is_Associated_With_My_Account();
+        }
+
+        private void Then_The_Updated_Policy_Is_Associated_With_My_Account()
+        {
+            var mockPolicy = CurrentUser.AlertPolicies.Single().Value;
 
             AssertPoliciesEqual(_policyResult, mockPolicy);
         }
@@ -127,7 +177,6 @@ namespace CenturyLinkCloudSdk.UAT
         {
             CollectionAssert.IsEmpty(CurrentUser.AlertPolicies);
         }
-
 
         private void Then_I_Receive_My_Policy()
         {
