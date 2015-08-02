@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -26,17 +27,38 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
         {
             return Request.CreateResponse(HttpStatusCode.OK, Users.ByAccountAlias[alias].AntiAffinityPolicies[id]);
         }
-    }
 
-    public class MockAntiAffinityPolicyDefinition
-    {
-        public string name { get; set; }
-        public string location { get; set; }
-    }    
-    
-    public class MockAntiAffinityPolicy : MockAntiAffinityPolicyDefinition
+        [Route("antiaffinitypolicies/{alias}/{id}")]
+        public HttpResponseMessage Put([FromUri] string alias, [FromUri] string id, [FromBody] MockAntiAffinityPolicy policy)
+        {
+            Users.ByAccountAlias[alias].AntiAffinityPolicies[id].name = policy.name;
+
+            return Request.CreateResponse(HttpStatusCode.OK, policy);
+        }
+
+        [Route("antiaffinitypolicies/{alias}")]
+        public HttpResponseMessage Post([FromUri] string alias, [FromBody] MockAntiAffinityPolicy policy)
+        {
+            policy.id = Guid.NewGuid().ToString();
+            Users.ByAccountAlias[alias].AntiAffinityPolicies.Add(policy.id, policy);
+
+            return Request.CreateResponse(HttpStatusCode.OK, policy);
+        }
+
+        [Route("antiaffinitypolicies/{alias}/{id}")]
+        public HttpResponseMessage Delete([FromUri] string alias, [FromUri] string id)
+        {
+            Users.ByAccountAlias[alias].AntiAffinityPolicies.Remove(id);
+
+            return Request.CreateResponse(HttpStatusCode.NoContent);
+        }
+    }
+   
+    public class MockAntiAffinityPolicy
     {
         public string id { get; set; }
+        public string name { get; set; }
+        public string location { get; set; }
     }
 
     public class MockAntiAffinityPolicyCollection
