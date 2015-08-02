@@ -41,6 +41,7 @@
     <Compile Include="Models\AlertPolicy.cs" />
     <Compile Include="Models\AntiAffinityPolicy.cs" />
     <Compile Include="Models\Internal\ActivityFilter.cs" />
+    <Compile Include="Models\Internal\AntiAffinityPolicyUpdate.cs" />
     <Compile Include="Models\Internal\DataCenter.cs" />
     <Compile Include="Models\Internal\ErrorReason.cs" />
     <Compile Include="Models\Internal\ModelCollection.cs" />

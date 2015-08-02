@@ -60,9 +60,13 @@ namespace CenturyLinkCloudSdk.Services
             return result.Items;
         }
 
-        public Task<AntiAffinityPolicy> Update(string policyId, string newName, CancellationToken cancellationToken = new CancellationToken())
+        public async Task<AntiAffinityPolicy> Update(string policyId, string newName, CancellationToken cancellationToken = new CancellationToken())
         {
-            throw new NotImplementedException();
+            var requestUri = await GetUri(policyId, cancellationToken);
+
+            var body = new AntiAffinityPolicyUpdate{Name = newName};
+
+            return await _httpClient.PutAsync<AntiAffinityPolicy>(requestUri, body, cancellationToken);
         }
 
         private async Task<string> GetUri(CancellationToken cancellationToken)

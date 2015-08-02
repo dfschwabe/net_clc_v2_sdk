@@ -187,5 +187,52 @@ namespace CenturyLinkCloudSdk.Tests.Services
             _client.Verify(x => x.GetAsync<AntiAffinityPolicy>(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
 
         }
+
+        [Test]
+        public void Update_PerformsCorrectRequest()
+        {
+            var expectedUri = String.Format("antiaffinitypolicies/{0}/{1}", AccountAlias, PolicyId);
+            var expectedName = "updated name";
+            var expectedToken = new CancellationTokenSource().Token;
+            AntiAffinityPolicyUpdate actualBody = null;
+
+            _client.Setup(x => x.PutAsync<AntiAffinityPolicy>(expectedUri, It.IsAny<object>(), expectedToken))
+                   .Callback<string, object, CancellationToken>((uri, body, token) => actualBody = (AntiAffinityPolicyUpdate)body)
+                   .Returns(Task.FromResult(new AntiAffinityPolicy()));
+
+            _testObject.Update(PolicyId, expectedName, expectedToken).Wait();
+
+            Assert.AreEqual(expectedName, actualBody.Name);
+            _client.VerifyAll();
+        }
+
+        [Test]
+        public void Update_ReturnsExpectedResult()
+        {
+            var expectedResult = new AntiAffinityPolicy();
+
+            _client.Setup(x => x.PutAsync<AntiAffinityPolicy>(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(expectedResult));
+
+            var actualResult = _testObject.Update(PolicyId, string.Empty, CancellationToken.None).Result;
+
+            Assert.AreSame(expectedResult, actualResult);
+        }
+
+        [Test]
+        public void Update_Aborts_OnTokenCancellation()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            _aliasProvider.Setup(x => x.GetAccountAlias())
+                          .Callback(() => tokenSource.Cancel(true))
+                          .Returns(Task.FromResult(AccountAlias));
+
+            Assert.Throws<TaskCanceledException>(() => _testObject.Update(PolicyId, string.Empty, tokenSource.Token).Await());
+
+            _client.Verify(x => x.PutAsync<AntiAffinityPolicy>(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>())
+                                 , Times.Never);
+
+        }
     }
 }
