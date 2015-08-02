@@ -54,7 +54,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
             _client.Setup(x => x.PostAsync<AlertPolicy>(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
                    .Returns(Task.FromResult(expectedResult));
 
-            var actualResult = _testObject.Create(new AlertPolicy(), CancellationToken.None).Result;
+            var actualResult = _testObject.Create(new AlertPolicyDefniition(), CancellationToken.None).Result;
 
             Assert.AreSame(expectedResult, actualResult);
         }
@@ -68,7 +68,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
                           .Callback(() => tokenSource.Cancel(true))
                           .Returns(Task.FromResult(AccountAlias));
 
-            Assert.Throws<TaskCanceledException>(() => _testObject.Create(new AlertPolicy(), tokenSource.Token).Await());
+            Assert.Throws<TaskCanceledException>(() => _testObject.Create(new AlertPolicyDefniition(), tokenSource.Token).Await());
 
             _client.Verify(x => x.PostAsync<AlertPolicy>(It.IsAny<string>(), It.IsAny<AlertPolicyDefniition>(), It.IsAny<CancellationToken>())
                                  , Times.Never);

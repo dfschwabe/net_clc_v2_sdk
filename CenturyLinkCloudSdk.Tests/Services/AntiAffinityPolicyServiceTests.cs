@@ -32,6 +32,50 @@ namespace CenturyLinkCloudSdk.Tests.Services
         }
 
         [Test]
+        public void Create_PerformsCorrectRequest()
+        {
+            var expectedUri = String.Format("antiaffinitypolicies/{0}", AccountAlias);
+            var expectedBody = new AntiAffinityPolicyDefinition();
+            var expectedToken = new CancellationTokenSource().Token;
+
+            _client.Setup(x => x.PostAsync<AntiAffinityPolicy>(expectedUri, expectedBody, expectedToken))
+                   .Returns(Task.FromResult(new AntiAffinityPolicy()));
+
+            _testObject.Create(expectedBody, expectedToken).Wait();
+
+            _client.VerifyAll();
+        }
+
+        [Test]
+        public void Create_ReturnsExpectedResult()
+        {
+            var expectedResult = new AntiAffinityPolicy();
+
+            _client.Setup(x => x.PostAsync<AntiAffinityPolicy>(It.IsAny<string>(), It.IsAny<object>(), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(expectedResult));
+
+            var actualResult = _testObject.Create(new AntiAffinityPolicyDefinition(), CancellationToken.None).Result;
+
+            Assert.AreSame(expectedResult, actualResult);
+        }
+
+        [Test]
+        public void Create_Aborts_OnTokenCancellation()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            _aliasProvider.Setup(x => x.GetAccountAlias())
+                          .Callback(() => tokenSource.Cancel(true))
+                          .Returns(Task.FromResult(AccountAlias));
+
+            Assert.Throws<TaskCanceledException>(() => _testObject.Create(new AntiAffinityPolicyDefinition(), tokenSource.Token).Await());
+
+            _client.Verify(x => x.PostAsync<AntiAffinityPolicy>(It.IsAny<string>(), It.IsAny<AlertPolicyDefniition>(), It.IsAny<CancellationToken>())
+                                 , Times.Never);
+
+        }
+
+        [Test]
         public void Get_PerformsCorrectRequest()
         {
             var expectedUri = String.Format("antiaffinitypolicies/{0}", AccountAlias);
