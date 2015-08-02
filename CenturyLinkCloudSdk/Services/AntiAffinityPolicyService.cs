@@ -15,6 +15,7 @@ namespace CenturyLinkCloudSdk.Services
         Task Delete(string policyId, CancellationToken cancellationToken = default(CancellationToken));
         Task<AntiAffinityPolicy> Get(string policyId, CancellationToken cancellationToken = default(CancellationToken));
         Task<List<AntiAffinityPolicy>> Get(CancellationToken cancellationToken = default(CancellationToken));
+        Task<AntiAffinityPolicy> Update(string policyId, string newName, CancellationToken cancellationToken = default(CancellationToken));
     }
 
     public class AntiAffinityPolicyService : ICenturyLinkCloudAntiAffinityPolicyService
@@ -53,6 +54,11 @@ namespace CenturyLinkCloudSdk.Services
             var result = await _httpClient.GetAsync<ModelCollection<AntiAffinityPolicy>>(requestUri, cancellationToken);
 
             return result.Items;
+        }
+
+        public Task<AntiAffinityPolicy> Update(string policyId, string newName, CancellationToken cancellationToken = new CancellationToken())
+        {
+            throw new NotImplementedException();
         }
 
         private async Task<string> GetUri(CancellationToken cancellationToken)
