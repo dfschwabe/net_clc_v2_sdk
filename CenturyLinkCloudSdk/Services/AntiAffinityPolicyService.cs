@@ -37,9 +37,11 @@ namespace CenturyLinkCloudSdk.Services
             return await _httpClient.PostAsync<AntiAffinityPolicy>(requestUri, definition, cancellationToken);
         }
 
-        public Task Delete(string policyId, CancellationToken cancellationToken = new CancellationToken())
+        public async Task Delete(string policyId, CancellationToken cancellationToken = new CancellationToken())
         {
-            throw new NotImplementedException();
+            var requestUri = await GetUri(policyId, cancellationToken);
+
+            await _httpClient.DeleteAsync(requestUri, cancellationToken);
         }
 
         public async Task<AntiAffinityPolicy> Get(string policyId, CancellationToken cancellationToken = new CancellationToken())

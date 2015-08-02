@@ -76,6 +76,35 @@ namespace CenturyLinkCloudSdk.Tests.Services
         }
 
         [Test]
+        public void Delete_PerformsCorrectRequest()
+        {
+            var expectedUri = String.Format("antiaffinitypolicies/{0}/{1}", AccountAlias, PolicyId);
+            var expectedToken = new CancellationTokenSource().Token;
+
+            _client.Setup(x => x.DeleteAsync(expectedUri, expectedToken))
+                   .Returns(Task.Run(() => { }));
+
+
+            _testObject.Delete(PolicyId, expectedToken).Wait();
+
+            _client.VerifyAll();
+        }
+
+        [Test]
+        public void Delete_Aborts_OnTokenCancellation()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            _aliasProvider.Setup(x => x.GetAccountAlias())
+                          .Callback(() => tokenSource.Cancel(true))
+                          .Returns(Task.FromResult(AccountAlias));
+
+            Assert.Throws<TaskCanceledException>(() => _testObject.Delete(PolicyId, tokenSource.Token).Await());
+
+            _client.Verify(x => x.DeleteAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        }
+
+        [Test]
         public void Get_PerformsCorrectRequest()
         {
             var expectedUri = String.Format("antiaffinitypolicies/{0}", AccountAlias);
