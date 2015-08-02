@@ -16,6 +16,15 @@ namespace CenturyLinkCloudSdk.UAT
         private List<AntiAffinityPolicy> _policyCollectionResult;
         private string _updatedPolicyName;
 
+        [SetUp]
+        public void Setup()
+        {
+            _policyResult = null;
+            _policyDefinition = null;
+            _policyCollectionResult = null;
+            _updatedPolicyName = null;
+        }
+
         [Test]
         public void Create_PostsPolicyDefinition_ToCorrectAccount()
         {
