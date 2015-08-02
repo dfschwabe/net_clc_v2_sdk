@@ -43,6 +43,7 @@
     <Compile Include="Models\Internal\ActivityFilter.cs" />
     <Compile Include="Models\Internal\DataCenter.cs" />
     <Compile Include="Models\Internal\ErrorReason.cs" />
+    <Compile Include="Models\Internal\ModelCollection.cs" />
     <Compile Include="Models\TotalAssets.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Runtime\Authentication.cs" />

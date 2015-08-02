@@ -52,7 +52,7 @@ namespace CenturyLinkCloudSdk
 
         public ICenturyLinkCloudAntiAffinityPolicyService CreateAntiAffinityPolicyService()
         {
-            throw new NotImplementedException();
+            return new AntiAffinityPolicyService(_clientWrapper, _authenticationProvider);
         }
     }
 }
