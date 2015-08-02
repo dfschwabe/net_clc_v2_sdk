@@ -15,7 +15,7 @@ namespace CenturyLinkCloudSdk.UAT
     {
         private AlertPolicyDefniition _policyDefinition;
         private AlertPolicy _policyResult;
-        private AlertPolicyCollection _policyCollectionResult;
+        private List<AlertPolicy> _policyCollectionResult;
 
         [SetUp]
         public void Setup()
@@ -187,7 +187,7 @@ namespace CenturyLinkCloudSdk.UAT
         {
             CurrentUser.AlertPolicies.Values.ToList().ForEach(mockPolicy =>
             {
-                var receivedPolicy = _policyCollectionResult.Items.Single(p => p.Id.Equals(mockPolicy.id));
+                var receivedPolicy = _policyCollectionResult.Single(p => p.Id.Equals(mockPolicy.id));
                 AssertPoliciesEqual(receivedPolicy, mockPolicy);
             });
         }

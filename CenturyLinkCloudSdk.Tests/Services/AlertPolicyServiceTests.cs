@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CenturyLinkCloudSdk.Models;
+using CenturyLinkCloudSdk.Models.Internal;
 using CenturyLinkCloudSdk.Runtime;
 using CenturyLinkCloudSdk.Runtime.Client;
 using CenturyLinkCloudSdk.Services;
@@ -108,8 +110,8 @@ namespace CenturyLinkCloudSdk.Tests.Services
             var expectedUri = String.Format("alertpolicies/{0}", AccountAlias);
             var expectedToken = new CancellationTokenSource().Token;
 
-            _client.Setup(x => x.GetAsync<AlertPolicyCollection>(expectedUri, expectedToken))
-                   .Returns(Task.FromResult(new AlertPolicyCollection()));
+            _client.Setup(x => x.GetAsync<ModelCollection<AlertPolicy>>(expectedUri, expectedToken))
+                   .Returns(Task.FromResult(new ModelCollection<AlertPolicy>()));
 
             _testObject.Get(expectedToken).Wait();
 
@@ -119,10 +121,10 @@ namespace CenturyLinkCloudSdk.Tests.Services
         [Test]
         public void Get_ReturnsExpectedResult()
         {
-            var expectedResult = new AlertPolicyCollection();
+            var expectedResult = new List<AlertPolicy>();
 
-            _client.Setup(x => x.GetAsync<AlertPolicyCollection>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
-                   .Returns(Task.FromResult(expectedResult));
+            _client.Setup(x => x.GetAsync<ModelCollection<AlertPolicy>>(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                   .Returns(Task.FromResult(new ModelCollection<AlertPolicy>{ Items = expectedResult }));
 
             var actualResult = _testObject.Get(CancellationToken.None).Result;
 
@@ -140,7 +142,7 @@ namespace CenturyLinkCloudSdk.Tests.Services
 
             Assert.Throws<TaskCanceledException>(() => _testObject.Get(tokenSource.Token).Await());
 
-            _client.Verify(x => x.GetAsync<AlertPolicyCollection>(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+            _client.Verify(x => x.GetAsync<ModelCollection<AlertPolicy>>(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
 
         }
 

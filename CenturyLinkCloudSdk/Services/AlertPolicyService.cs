@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CenturyLinkCloudSdk.Models;
+using CenturyLinkCloudSdk.Models.Internal;
 using CenturyLinkCloudSdk.Runtime;
 using CenturyLinkCloudSdk.Runtime.Client;
 
@@ -12,7 +14,7 @@ namespace CenturyLinkCloudSdk.Services
          Task<AlertPolicy> Create(AlertPolicyDefniition definition, CancellationToken cancellationToken = default(CancellationToken));
          Task Delete(string policyId, CancellationToken cancellationToken = default(CancellationToken));
          Task<AlertPolicy> Get(string policyId, CancellationToken cancellationToken = default(CancellationToken));
-         Task<AlertPolicyCollection> Get(CancellationToken cancellationToken = default(CancellationToken));
+         Task<List<AlertPolicy>> Get(CancellationToken cancellationToken = default(CancellationToken));
          Task<AlertPolicy> Update(string policyId, AlertPolicyDefniition policyDefinition, CancellationToken cancellationToken = default(CancellationToken));
     }
 
@@ -49,11 +51,13 @@ namespace CenturyLinkCloudSdk.Services
             return await _httpClient.GetAsync<AlertPolicy>(requestUri, cancellationToken);
         }
 
-        public async Task<AlertPolicyCollection> Get(CancellationToken cancellationToken = new CancellationToken())
+        public async Task<List<AlertPolicy>> Get(CancellationToken cancellationToken = new CancellationToken())
         {
             var requestUri = await GetUri(cancellationToken);
 
-            return await _httpClient.GetAsync<AlertPolicyCollection>(requestUri, cancellationToken);
+            var result = await _httpClient.GetAsync<ModelCollection<AlertPolicy>>(requestUri, cancellationToken);
+
+            return result.Items;
         }
 
         public async Task<AlertPolicy> Update(string policyId, AlertPolicyDefniition definition, CancellationToken cancellationToken = new CancellationToken())
