@@ -11,6 +11,7 @@ namespace CenturyLinkCloudSdk.Services
 {
     public interface ICenturyLinkCloudAntiAffinityPolicyService
     {
+        Task<AntiAffinityPolicy> Create(AntiAffinityPolicyDefinition definition, CancellationToken cancellationToken = default(CancellationToken));
         Task<AntiAffinityPolicy> Get(string policyId, CancellationToken cancellationToken = default(CancellationToken));
         Task<List<AntiAffinityPolicy>> Get(CancellationToken cancellationToken = default(CancellationToken));
     }
@@ -25,6 +26,11 @@ namespace CenturyLinkCloudSdk.Services
         {
             _httpClient = httpClient;
             _aliasProvider = aliasProvider;
+        }
+
+        public Task<AntiAffinityPolicy> Create(AntiAffinityPolicyDefinition definition, CancellationToken cancellationToken = new CancellationToken())
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<AntiAffinityPolicy> Get(string policyId, CancellationToken cancellationToken = new CancellationToken())

@@ -12,7 +12,19 @@ namespace CenturyLinkCloudSdk.UAT
     public class AntiAffinityPolicyServiceTests : FixtureBase
     {
         private AntiAffinityPolicy _policyResult;
+        private AntiAffinityPolicyDefinition _policyDefinition;
         private List<AntiAffinityPolicy> _policyCollectionResult;
+
+        [Test]
+        public void Create_PostsPolicyDefinition_ToCorrectAccount()
+        {
+            Given_I_Am(Users.A);
+
+            When_I_Create_A_New_Policy();
+
+            Then_I_Recieve_The_New_Policy();
+            Then_The_New_Policy_Is_Associated_With_My_Account();
+        }
 
         [Test]
         public void Get_RetreivesAllPolicies()
@@ -47,6 +59,17 @@ namespace CenturyLinkCloudSdk.UAT
             AddPolicy("policy1");
         }
 
+        private void When_I_Create_A_New_Policy()
+        {
+            _policyDefinition = new AntiAffinityPolicyDefinition
+            {
+                Name = "new policy",
+                Location = "CA3"
+            };
+
+            _policyResult = ServiceFactory.CreateAntiAffinityPolicyService().Create(_policyDefinition, CancellationToken.None).Result;
+        }
+        
         private void When_I_Get_My_Policies()
         {
             _policyCollectionResult = ServiceFactory.CreateAntiAffinityPolicyService().Get(CancellationToken.None).Result;
@@ -55,6 +78,19 @@ namespace CenturyLinkCloudSdk.UAT
         private void When_I_Get_My_Policy()
         {
             _policyResult = ServiceFactory.CreateAntiAffinityPolicyService().Get(CurrentUser.AntiAffinityPolicies.First().Key, CancellationToken.None).Result;
+        }
+
+        private void Then_I_Recieve_The_New_Policy()
+        {
+            Assert.AreEqual(_policyDefinition.Name, _policyResult.Name);
+            Assert.AreEqual(_policyDefinition.Location, _policyResult.Location);
+        }
+
+        private void Then_The_New_Policy_Is_Associated_With_My_Account()
+        {
+            var mockPolicy = CurrentUser.AlertPolicies.Single().Value;
+
+            Assert.AreEqual(mockPolicy.id, _policyResult.Id);
         }
 
         private void Then_I_Receive_All_Of_My_Policies()

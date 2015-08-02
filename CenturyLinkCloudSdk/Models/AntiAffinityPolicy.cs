@@ -1,9 +1,13 @@
 ﻿namespace CenturyLinkCloudSdk.Models
 {
-    public class AntiAffinityPolicy
+    public class AntiAffinityPolicyDefinition
     {
-        public string Id { get; set; }
         public string Name { get; set; }
         public string Location { get; set; }
+    }
+
+    public class AntiAffinityPolicy : AntiAffinityPolicyDefinition
+    {
+        public string Id { get; set; }
     }
 }
