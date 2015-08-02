@@ -27,6 +27,17 @@ namespace CenturyLinkCloudSdk.UAT
         }
 
         [Test]
+        public void Delete_DeletesCorrectPolicy()
+        {
+            Given_I_Am(Users.A);
+            Given_I_Have_An_AntiAffinity_Policy();
+
+            When_I_Delete_The_Policy();
+
+            Then_The_Policy_Is_Removed_From_My_Account();
+        }
+
+        [Test]
         public void Get_RetreivesAllPolicies()
         {
             Given_I_Am(Users.A);
@@ -69,7 +80,12 @@ namespace CenturyLinkCloudSdk.UAT
 
             _policyResult = ServiceFactory.CreateAntiAffinityPolicyService().Create(_policyDefinition, CancellationToken.None).Result;
         }
-        
+
+        private void When_I_Delete_The_Policy()
+        {
+            ServiceFactory.CreateAntiAffinityPolicyService().Delete(CurrentUser.AntiAffinityPolicies.First().Key, CancellationToken.None).Wait();
+        }
+
         private void When_I_Get_My_Policies()
         {
             _policyCollectionResult = ServiceFactory.CreateAntiAffinityPolicyService().Get(CancellationToken.None).Result;
@@ -88,9 +104,14 @@ namespace CenturyLinkCloudSdk.UAT
 
         private void Then_The_New_Policy_Is_Associated_With_My_Account()
         {
-            var mockPolicy = CurrentUser.AlertPolicies.Single().Value;
+            var mockPolicy = CurrentUser.AntiAffinityPolicies.Single().Value;
 
             Assert.AreEqual(mockPolicy.id, _policyResult.Id);
+        }
+
+        private void Then_The_Policy_Is_Removed_From_My_Account()
+        {
+            CollectionAssert.IsEmpty(CurrentUser.AntiAffinityPolicies);
         }
 
         private void Then_I_Receive_All_Of_My_Policies()
