@@ -19,7 +19,8 @@ namespace CenturyLinkCloudSdk.UAT.Mock
                 AccountAlias = "aliasA",
                 RecentActivity = new List<MockActivity>(),
                 DataCentersById = new Dictionary<string, MockDataCenter>(),
-                AlertPolicies = new Dictionary<string, MockAlertPolicy>()
+                AlertPolicies = new Dictionary<string, MockAlertPolicy>(),
+                AntiAffinityPolicies = new Dictionary<string, MockAntiAffinityPolicy>()
             };
 
             UserB = new User
@@ -29,7 +30,8 @@ namespace CenturyLinkCloudSdk.UAT.Mock
                 AccountAlias = "aliasB",
                 RecentActivity = new List<MockActivity>(),
                 DataCentersById = new Dictionary<string, MockDataCenter>(),
-                AlertPolicies = new Dictionary<string, MockAlertPolicy>()
+                AlertPolicies = new Dictionary<string, MockAlertPolicy>(),
+                AntiAffinityPolicies = new Dictionary<string, MockAntiAffinityPolicy>()
             };
 
             All = new List<User> { UserA, UserB };
@@ -55,6 +57,7 @@ namespace CenturyLinkCloudSdk.UAT.Mock
                 u.AlertPolicies.Clear();
                 u.DataCentersById.Clear();
                 u.RecentActivity.Clear();
+                u.AntiAffinityPolicies.Clear();
             });
         }
     }
@@ -66,7 +69,9 @@ namespace CenturyLinkCloudSdk.UAT.Mock
         public string AccountAlias { get; set; }
         public List<MockActivity> RecentActivity { get; set; }
         public Dictionary<string, MockDataCenter> DataCentersById { get; set; }
-        public Dictionary<string,MockAlertPolicy> AlertPolicies { get; set; } 
+        public Dictionary<string,MockAlertPolicy> AlertPolicies { get; set; }
+        public Dictionary<string,MockAntiAffinityPolicy> AntiAffinityPolicies { get; set; }
+
     }
 
     public class MockActivity

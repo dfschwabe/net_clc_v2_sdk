@@ -76,6 +76,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Mock\Controllers\AlertPolicyController.cs" />
+    <Compile Include="Mock\Controllers\AntiAffinityPolicyController.cs" />
     <Compile Include="Mock\Controllers\AuthenticationController.cs" />
     <Compile Include="Mock\Controllers\DatacenterController.cs" />
     <Compile Include="Mock\Controllers\SearchController.cs" />
