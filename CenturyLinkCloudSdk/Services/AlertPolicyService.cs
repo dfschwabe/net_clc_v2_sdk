@@ -18,6 +18,7 @@ namespace CenturyLinkCloudSdk.Services
 
     public class AlertPolicyService : ICenturyLinkCloudAlertPolicyService
     {
+        private const string Api = "alertpolicies";
         private readonly IHttpClient _httpClient;
         private readonly IAliasProvider _aliasProvider;
 
@@ -29,47 +30,60 @@ namespace CenturyLinkCloudSdk.Services
 
         public async Task<AlertPolicy> Create(AlertPolicyDefniition definition, CancellationToken cancellationToken = new CancellationToken())
         {
-            var alias = await _aliasProvider.GetAccountAlias();
-            
-            cancellationToken.ThrowIfCancellationRequested();
+            var requestUri = await GetUri(cancellationToken);
 
-            return await _httpClient.PostAsync<AlertPolicy>(String.Format("alertpolicies/{0}", alias), definition, cancellationToken);
+            return await _httpClient.PostAsync<AlertPolicy>(requestUri, definition, cancellationToken);
         }
 
         public async Task Delete(string policyId, CancellationToken cancellationToken = new CancellationToken())
         {
-            var alias = await _aliasProvider.GetAccountAlias();
+            var requestUri = await GetUri(policyId, cancellationToken);
 
-            cancellationToken.ThrowIfCancellationRequested();
-
-            await _httpClient.DeleteAsync(String.Format("alertpolicies/{0}/{1}", alias, policyId), cancellationToken);
+            await _httpClient.DeleteAsync(requestUri, cancellationToken);
         }
 
         public async Task<AlertPolicy> Get(string policyId, CancellationToken cancellationToken = new CancellationToken())
         {
-            var alias = await _aliasProvider.GetAccountAlias();
+            var requestUri = await GetUri(policyId, cancellationToken);
 
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await _httpClient.GetAsync<AlertPolicy>(String.Format("alertpolicies/{0}/{1}", alias, policyId), cancellationToken);
+            return await _httpClient.GetAsync<AlertPolicy>(requestUri, cancellationToken);
         }
 
         public async Task<AlertPolicyCollection> Get(CancellationToken cancellationToken = new CancellationToken())
         {
-            var alias = await _aliasProvider.GetAccountAlias();
+            var requestUri = await GetUri(cancellationToken);
 
-            cancellationToken.ThrowIfCancellationRequested();
-
-            return await _httpClient.GetAsync<AlertPolicyCollection>(String.Format("alertpolicies/{0}", alias), cancellationToken);
+            return await _httpClient.GetAsync<AlertPolicyCollection>(requestUri, cancellationToken);
         }
 
         public async Task<AlertPolicy> Update(string policyId, AlertPolicyDefniition definition, CancellationToken cancellationToken = new CancellationToken())
         {
-            var alias = await _aliasProvider.GetAccountAlias();
+            var requestUri = await GetUri(policyId, cancellationToken);
+
+            return await _httpClient.PutAsync<AlertPolicy>(requestUri, definition, cancellationToken);
+        }
+
+        private async Task<string> GetUri(CancellationToken cancellationToken)
+        {
+            var alias = await GetAlias(cancellationToken);
+
+            return String.Format("{0}/{1}", Api, alias);
+        }
+
+        private async Task<string> GetUri(string policyId, CancellationToken cancellationToken)
+        {
+            var alias = await GetAlias(cancellationToken);
+
+            return String.Format("{0}/{1}/{2}", Api, alias, policyId);
+        }
+
+        private async Task<string> GetAlias(CancellationToken cancellationToken)
+        {
+            var result = await _aliasProvider.GetAccountAlias();
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            return await _httpClient.PutAsync<AlertPolicy>(String.Format("alertpolicies/{0}/{1}", alias, policyId), definition, cancellationToken);
+            return result;
         }
     }
 }
