@@ -39,6 +39,7 @@
     <Compile Include="Extensions\HttpResponseMessageExtensions.cs" />
     <Compile Include="Models\Activity.cs" />
     <Compile Include="Models\AlertPolicy.cs" />
+    <Compile Include="Models\AntiAffinityPolicy.cs" />
     <Compile Include="Models\Internal\ActivityFilter.cs" />
     <Compile Include="Models\Internal\DataCenter.cs" />
     <Compile Include="Models\Internal\ErrorReason.cs" />
@@ -52,6 +53,7 @@
     <Compile Include="Runtime\LoginRequest.cs" />
     <Compile Include="Services\AccountService.cs" />
     <Compile Include="Services\AlertPolicyService.cs" />
+    <Compile Include="Services\AntiAffinityPolicyService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json">
