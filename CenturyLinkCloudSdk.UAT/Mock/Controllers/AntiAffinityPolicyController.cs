@@ -31,9 +31,10 @@ namespace CenturyLinkCloudSdk.UAT.Mock.Controllers
         [Route("antiaffinitypolicies/{alias}/{id}")]
         public HttpResponseMessage Put([FromUri] string alias, [FromUri] string id, [FromBody] MockAntiAffinityPolicy policy)
         {
-            Users.ByAccountAlias[alias].AntiAffinityPolicies[id].name = policy.name;
+            var result = Users.ByAccountAlias[alias].AntiAffinityPolicies[id];
+            result.name = policy.name;
 
-            return Request.CreateResponse(HttpStatusCode.OK, policy);
+            return Request.CreateResponse(HttpStatusCode.OK, result);
         }
 
         [Route("antiaffinitypolicies/{alias}")]
