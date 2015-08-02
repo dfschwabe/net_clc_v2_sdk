@@ -32,8 +32,8 @@ namespace CenturyLinkCloudSdk.UAT
 
             When_I_Create_A_New_Policy();
 
-            Then_I_Recieve_The_New_Policy();
-            Then_The_New_Policy_Is_Associated_With_My_Account();
+            Then_I_Recieve_The_Policy();
+            Then_The_Policy_Is_Associated_With_My_Account();
         }
 
         [Test]
@@ -66,8 +66,8 @@ namespace CenturyLinkCloudSdk.UAT
 
             When_I_Update_My_Policy();
 
-            Then_I_Recieve_The_Updated_Policy();
-            Then_The_Updated_Policy_Is_Associated_With_My_Account();
+            Then_I_Recieve_The_Policy();
+            Then_The_Policy_Is_Associated_With_My_Account();
         }
 
         [Test]
@@ -147,26 +147,14 @@ namespace CenturyLinkCloudSdk.UAT
             _policyCollectionResult = ServiceFactory.CreateAlertPolicyService().Get(CancellationToken.None).Result;
         }
 
-        private void Then_I_Recieve_The_New_Policy()
+        private void Then_I_Recieve_The_Policy()
         {
             Assert.AreEqual(_policyDefinition.Name, _policyResult.Name);
             CollectionAssert.AreEqual(_policyDefinition.Actions, _policyResult.Actions, new AlertActionComparer());
             CollectionAssert.AreEqual(_policyDefinition.Triggers, _policyResult.Triggers, new AlertTriggerComparer());
         }
 
-        private void Then_I_Recieve_The_Updated_Policy()
-        {
-            Assert.AreEqual(_policyDefinition.Name, _policyResult.Name);
-            CollectionAssert.AreEqual(_policyDefinition.Actions, _policyResult.Actions, new AlertActionComparer());
-            CollectionAssert.AreEqual(_policyDefinition.Triggers, _policyResult.Triggers, new AlertTriggerComparer());
-        }
-
-        private void Then_The_New_Policy_Is_Associated_With_My_Account()
-        {
-            Then_The_Updated_Policy_Is_Associated_With_My_Account();
-        }
-
-        private void Then_The_Updated_Policy_Is_Associated_With_My_Account()
+        private void Then_The_Policy_Is_Associated_With_My_Account()
         {
             var mockPolicy = CurrentUser.AlertPolicies.Single().Value;
 
